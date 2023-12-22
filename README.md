@@ -1,5 +1,5 @@
 1: Télécharger Ganache https://trufflesuite.com/ganache/
-
+2. Télécharger Truffle https://trufflesuite.com/docs/truffle/how-to/install/
 2: executer la commande "flutter pub get" pour récupérer les packages nécéssaires à la communication avec
 la blockchain notemment Truffle et http
 
