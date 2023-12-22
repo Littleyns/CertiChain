@@ -83,6 +83,23 @@ class Web3Service {
       };
     }).toList();
   }
+  Future<List<dynamic>> getParticularDocuments(String particularAddress) async {
+    final contractFunction = contract.function('getParticularDocuments');
+    final result = await _web3Connection.client.call(
+      contract: contract,
+      function: contractFunction,
+      params: [EthereumAddress.fromHex(particularAddress)],
+    );
+
+    final documents = result[0].toList();
+    return documents.map((document) {
+      return {
+        'docId': document[0],
+        'templateDoc': document[1],
+        'description': document[2],
+      };
+    }).toList();
+  }
   Future<void> addFavouriteOrg(EthPrivateKey credentials, String orgAddress) async {
     final contractFunction = contract.function('addFavouriteOrg');
     await _web3Connection.client.sendTransaction(
@@ -164,7 +181,7 @@ class Web3Service {
   }
 
   Future<void> acceptDocumentRequest(
-      Credentials credentials, String particularAddress, String docRequestId) async {
+      Credentials credentials, String docRequestId) async {
     final contractFunction = contract.function('acceptDocumentRequest');
     await _web3Connection.client.sendTransaction(
       credentials,
@@ -172,7 +189,6 @@ class Web3Service {
         contract: contract,
         function: contractFunction,
         parameters: [
-          EthereumAddress.fromHex(particularAddress),
           BigInt.parse(docRequestId),
         ],
       ),

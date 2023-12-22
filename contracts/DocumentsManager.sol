@@ -1,6 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity >=0.4.22 <0.9.0;
-
+pragma solidity 0.8.19;
 
 contract DocumentsManager {
   address public owner;
@@ -102,19 +101,18 @@ contract DocumentsManager {
     owner = msg.sender;
   }
 
-  function addParticular(address _particularAddress, string memory _username)
-  external
-  {
-    // vérifier la signature de la transaction
-    particulars[_particularAddress].username = _username;
-    particulars[_particularAddress].particularAddress = _particularAddress;
-  }
   function addOrganisation(address _orgAddress, string memory _name)
   external
   onlyOwner
   {
     organisations[_orgAddress].name = _name;
     organisations[_orgAddress].organisationAddress = _orgAddress;
+  }
+  function addParticular(address _particularAddress, string memory _name)
+  external
+  {
+    particulars[_particularAddress].username = _name;
+    particulars[_particularAddress].particularAddress = _particularAddress;
   }
 
   function addFavouriteOrg(address _orgAddress) external onlyParticular {
@@ -177,7 +175,6 @@ contract DocumentsManager {
   }
 
   function acceptDocumentRequest(
-    address _particularAddress,
     uint256 _docRequestId
   ) external onlyOrg { // Accepte la requete d'un particulier
     // vérifier que la templateDoc existe et qu'il appartient à l'organisation
@@ -193,7 +190,7 @@ contract DocumentsManager {
     //Création d'une requete d'attribution
     GrantRequest memory newRequest = GrantRequest({
     grantRequestId: nextGrantRequestId,
-    recipient: _particularAddress,
+    recipient: docRequest.issuer,
     issuer: msg.sender,
     docId: grantedDoc.docId,
     status: DocumentTransactionStatus.Approved
@@ -202,8 +199,8 @@ contract DocumentsManager {
 
     // Persistence
     organisations[msg.sender].documentRequestsGranted.push(newRequest);
-    particulars[_particularAddress].documentRequestsReceived.push(newRequest);
-    particulars[_particularAddress].documents.push(grantedDoc);
+    particulars[docRequest.issuer].documentRequestsReceived.push(newRequest);
+    particulars[docRequest.issuer].documents.push(grantedDoc);
     grantRequests[newRequest.grantRequestId] = newRequest;
     documents[grantedDoc.docId] = grantedDoc;
     docRequest.status = DocumentTransactionStatus.Approved;
@@ -287,6 +284,9 @@ contract DocumentsManager {
 
   function getOrgTemplateDocuments(address _orgAddress) external view returns (TemplateDocument[] memory) {
     return organisations[_orgAddress].templateDocuments;
+  }
+  function getParticularDocuments(address _particularAddress) external view returns (Document[] memory) {
+    return particulars[_particularAddress].documents;
   }
 
   function getFavouriteOrgs()
