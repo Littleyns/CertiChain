@@ -1,10 +1,10 @@
 import 'Consts.dart';
 
 class GrantRequest { // C'est l'attribution d'un document à un particulier par un organisme (Organisme ---GrantRequest--> Particulier)
-  int grantRequestId;
+  String grantRequestId;
   String issuer;
   String recipient;
-  int docId;
+  String docId;
   DocumentTransactionStatus status;
 
   GrantRequest({

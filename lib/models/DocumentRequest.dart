@@ -1,10 +1,10 @@
 import 'Consts.dart';
 
 class DocumentRequest { // C'est la demande de document par un particulier à un organisme (Particulier ---DocumentRequest--> Organisme)
-  int docRequestId;
+  String docRequestId;
   String issuer;
   String recipient;
-  int templateDocId;
+  String templateDocId;
   DocumentTransactionStatus status;
 
   DocumentRequest({

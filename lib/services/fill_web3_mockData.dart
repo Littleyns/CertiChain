@@ -3,6 +3,9 @@ import 'package:chatflutter/services/web3_connection.dart';
 import 'package:chatflutter/services/web3_service.dart';
 import 'package:flutter/widgets.dart' show WidgetsFlutterBinding;
 import 'package:web3dart/credentials.dart';
+
+import '../models/TemplateDocument.dart';
+import '../models/Document.dart';
 void main() async {
   // Right before you would be doing any loading
   WidgetsFlutterBinding.ensureInitialized();
@@ -33,11 +36,11 @@ void main() async {
 
 
   // Récupération des documents de l'organisation
-  List<dynamic> templateDocuments = await web3Service.getOrgTemplateDocuments(adressePubliqueOrganisation);
+  List<TemplateDocument> templateDocuments = await web3Service.getOrgTemplateDocuments(adressePubliqueOrganisation);
   print(templateDocuments);
-  var diplomeInge = templateDocuments[3];
+  TemplateDocument diplomeInge = templateDocuments[3];
   //Demande d'un document par un particulier à un organisme
-  await web3Service.requestDocument(EthPrivateKey.fromHex(adressePriveeParticulier),"0xdA6Bb12d7C02565df8C4dC1C86A881aa2597d2F0",diplomeInge["id"].toString());
+  await web3Service.requestDocument(EthPrivateKey.fromHex(adressePriveeParticulier),"0xdA6Bb12d7C02565df8C4dC1C86A881aa2597d2F0",diplomeInge.id);
   print("Document requested from to");
 
   // acceptation de la requete par un organisme
@@ -45,7 +48,7 @@ void main() async {
   print("Document accepted from organisation");
 
   //Récupération des documents de l'utilisateur
-  List<dynamic> documentsParticulier =await web3Service.getParticularDocuments(adressePubliqueParticulier);
+  List<Document> documentsParticulier =await web3Service.getParticularDocuments(adressePubliqueParticulier);
   print(documentsParticulier);
 
   print("Ended...");
