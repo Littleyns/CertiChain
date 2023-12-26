@@ -289,6 +289,14 @@ contract DocumentsManager {
     return particulars[_particularAddress].documents;
   }
 
+  function getAllParticularDocuments() external view returns (Document[] memory) {
+     Document[] memory res = new Document[](nextDocumentId);
+    for(uint256 i = 0; i< nextDocumentId; i++){
+      res[i] = documents[i];
+    }
+    return res;
+  }
+
   function getFavouriteOrgs()
   external
   view
