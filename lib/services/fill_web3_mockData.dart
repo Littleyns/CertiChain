@@ -38,7 +38,7 @@ void main() async {
   // Récupération des documents de l'organisation
   List<TemplateDocument> templateDocuments = await web3Service.getOrgTemplateDocuments(adressePubliqueOrganisation);
   print(templateDocuments);
-  TemplateDocument diplomeInge = templateDocuments[3];
+  TemplateDocument diplomeInge = templateDocuments[0];
   //Demande d'un document par un particulier à un organisme
   await web3Service.requestDocument(EthPrivateKey.fromHex(adressePriveeParticulier),"0xdA6Bb12d7C02565df8C4dC1C86A881aa2597d2F0",diplomeInge.id);
   print("Document requested from to");

@@ -82,6 +82,19 @@ class Web3Service {
     templateDocuments.forEach((document)=>res.add(TemplateDocument(id: document[0].toString(), name: document[1])));
     return res;
   }
+  Future<List<Document>> getAllDocuments() async {
+    final contractFunction = contract.function('getAllParticularDocuments');
+    final result = await _web3Connection.client.call(
+      contract: contract,
+      function: contractFunction,
+      params: [],
+    );
+
+    final documents = result[0].toList();
+    List<Document> res = [];
+    documents.forEach((document)=>res.add(Document(docId:document[0].toString(),templateDoc:TemplateDocument(id: document[1][0].toString(), name: document[1][1]),description:document[2])));
+    return res;
+  }
   Future<List<Document>> getParticularDocuments(String particularAddress) async {
     final contractFunction = contract.function('getParticularDocuments');
     final result = await _web3Connection.client.call(
