@@ -14,4 +14,7 @@ class DocumentRequest { // C'est la demande de document par un particulier à un
     required this.templateDocId,
     required this.status,
   });
+
+
+
 }

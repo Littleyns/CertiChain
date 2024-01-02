@@ -71,50 +71,51 @@ class _BlockchainScreenState extends State<BlockchainScreen> {
   @override
   Widget build(BuildContext context) {
     return Column(
+      children: [
+        Row(mainAxisAlignment:MainAxisAlignment.center ,
+          crossAxisAlignment: CrossAxisAlignment.center,
 
-        children:[Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            children: [
-              Row(
+          children: [
+            DropdownButton<SearchFilter>(
+              value: selectedFilter,
+              onChanged: (value) {
+                setState(() {
+                  selectedFilter = value!;
+                });
+              },
+              items: SearchFilter.values
+                  .map((filter) => DropdownMenuItem(
+                value: filter,
+                child: Text(filter == SearchFilter.address ? 'Adresse' : 'Nom'),
+              ))
+                  .toList(),
+            ),
+            SizedBox(width: 16),
+            Expanded(
+              child: TextField(
+                controller: searchController,
+                decoration: InputDecoration(labelText: selectedFilter == SearchFilter.address ? 'Adresse' : 'Nom'),
+                onSubmitted: (value) => exploreData(),
+              ),
+            ),
 
-                children: [
-                  Container(
-                    height:100,
-                    width:100,
-                    child: TextField(
-                      controller: searchController,
-                      decoration: InputDecoration(labelText: selectedFilter == SearchFilter.address ? 'Adresse' : 'Nom'),
-                      onSubmitted: (value) => exploreData(),
-                    ),
-                  ),
-                  SizedBox(width: 16),
-                  DropdownButton<SearchFilter>(
-                    value: selectedFilter,
-                    onChanged: (value) {
-                      setState(() {
-                        selectedFilter = value!;
-                      });
-                    },
-                    items: SearchFilter.values
-                        .map((filter) => DropdownMenuItem(
-                      value: filter,
-                      child: Text(filter == SearchFilter.address ? 'Adresse' : 'Nom'),
-                    ))
-                        .toList(),
-                  ),
-                ],
-              ),
-              SizedBox(height: 16),
-              ElevatedButton(
-                onPressed: exploreData,
-                child: Text('Explorer les données'),
-              ),
-              _buildTemplateDocumentsGrid(),
-            ],
-          ),
+
+          ],
         ),
-        ]);
+        SizedBox(height: 16),
+        ElevatedButton(
+          onPressed: exploreData,
+          child: Text('Explorer les données'),
+        ),
+        SizedBox(height: 32),
+        Container(
+          width:double.infinity,
+          height:300,
+          child:_buildTemplateDocumentsGrid(),
+        ),
+
+      ],
+    );
   }
   Widget _buildTemplateDocumentsGrid() {
     if (particularDocuments.isEmpty) {
@@ -122,39 +123,47 @@ class _BlockchainScreenState extends State<BlockchainScreen> {
         child: CircularProgressIndicator(),
       );
     } else {
-      return GridView.builder(
-        scrollDirection: Axis.vertical,
-        shrinkWrap: true,
-        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 2,
-          crossAxisSpacing: 8.0,
-          mainAxisSpacing: 8.0,
-        ),
+      return ListView.builder(
+        scrollDirection: Axis.horizontal, // Définissez la direction de défilement sur horizontal
         itemCount: particularDocuments.length,
         itemBuilder: (context, index) {
-          return _buildTemplateDocumentBlock(particularDocuments[index]);
+          return Row(
+            children: [Container(
+              width: 300.0, // Largeur fixe
+              height: 300.0, // Hauteur fixe
+              decoration: BoxDecoration(
+                border: Border.all(color: Colors.black),
+                borderRadius: BorderRadius.circular(8.0),
+              ),
+              padding: EdgeInsets.all(8.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('docId: ${particularDocuments[index].docId}'),
+                  SizedBox(height: 8.0),
+                  Text('templateDoc: ${particularDocuments[index].templateDoc}'),
+                  SizedBox(height: 8.0),
+                  Text('description: ${particularDocuments[index].description}'),
+                  SizedBox(height: 8.0),
+                  Text('owner: ${particularDocuments[index].particularAddress}'),
+                  SizedBox(height: 8.0),
+                  Text('org transmitter: ${particularDocuments[index].organisationAddress}'),
+                ],
+              ),
+            ),
+              Container(
+                width:20,
+                child: Divider(
+                  height: 1, // Hauteur du Divider (trait horizontal)
+
+                  color: Colors.black, // Couleur du Divider
+                ),
+              ),],
+          );
         },
       );
+
     }
-  }
-  Widget _buildTemplateDocumentBlock(Document particularDocument) {
-    return Container(
-      decoration: BoxDecoration(
-        border: Border.all(color: Colors.black),
-        borderRadius: BorderRadius.circular(8.0),
-      ),
-      padding: EdgeInsets.all(8.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text('docId: ${particularDocument.docId}'),
-          SizedBox(height: 8.0),
-          Text('templateDoc: ${particularDocument.templateDoc}'),
-          SizedBox(height: 8.0),
-          Text('description: ${particularDocument.description}'),
-        ],
-      ),
-    );
   }
 
 

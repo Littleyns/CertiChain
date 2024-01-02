@@ -39,6 +39,8 @@ contract DocumentsManager {
     uint256 docId;
     TemplateDocument templateDoc;
     string description;
+    address particularAddress;
+    address organisationAddress;
 
   }
   struct Organisation {
@@ -149,6 +151,8 @@ contract DocumentsManager {
     Document memory grantedDoc = Document({
     docId: nextDocumentId,
     templateDoc: templateDocuments[_templateDocId],
+    particularAddress: _particularAddress,
+    organisationAddress: msg.sender,
     description: "haha this is a document"
     });
     nextDocumentId++;
@@ -181,6 +185,8 @@ contract DocumentsManager {
     DocumentRequest memory docRequest = docRequests[_docRequestId];
     //Création d'un document à partir du template
     Document memory grantedDoc = Document({
+    particularAddress: docRequest.issuer,
+    organisationAddress: msg.sender,
     docId: nextDocumentId,
     templateDoc: templateDocuments[docRequest.templateDocId],
     description: "haha this is a document"
@@ -220,7 +226,7 @@ contract DocumentsManager {
 
     // Mettre à jour le statut de la demande d'attribution
     grantRequest.status = DocumentTransactionStatus.Rejected;
-
+    // !! effacer le document créé
     // Émettre un événement pour notifier le rejet de la demande
     emit DocumentGranted(grantRequest.issuer, msg.sender, grantRequest.docId);
   }
@@ -295,6 +301,14 @@ contract DocumentsManager {
       res[i] = documents[i];
     }
     return res;
+  }
+
+  function getOrgRequestsReceived(address _orgAddress) external view returns(DocumentRequest[] memory){
+    require(
+      msg.sender == owner || msg.sender == _orgAddress,
+      "Administrator or owner of the org can see requests"
+    );
+    return organisations[msg.sender].documentRequestsReceived;
   }
 
   function getFavouriteOrgs()
