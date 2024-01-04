@@ -111,6 +111,33 @@ class Web3Service {
     documents.forEach((document)=>res.add(Document(docId:document[0].toString(),templateDoc:TemplateDocument(id: document[1][0].toString(), name: document[1][1]),particularAddress:document[3].toString(),organisationAddress:document[4].toString(),description:document[2])));
     return res;
   }
+
+  Future<List<Document>> getDocumentsByTemplateName(String templateName) async {
+    final contractFunction = contract.function('getDocumentsByTemplateName');
+    final result = await _web3Connection.client.call(
+      contract: contract,
+      function: contractFunction,
+      params: [templateName],
+    );
+    final documents = result[0].toList();
+    List<Document> res = [];
+    documents.forEach((document)=>res.add(Document(docId:document[0].toString(),templateDoc:TemplateDocument(id: document[1][0].toString(), name: document[1][1]),particularAddress:document[3].toString(),organisationAddress:document[4].toString(),description:document[2])));
+    return res;
+  }
+    Future<List<Document>> getOrgDocuments(String orgAddress) async {
+      final contractFunction = contract.function('getOrgDocuments');
+      final result = await _web3Connection.client.call(
+        contract: contract,
+        function: contractFunction,
+        params: [EthereumAddress.fromHex(orgAddress)],
+      );
+
+    final documents = result[0].toList();
+    List<Document> res = [];
+    documents.forEach((document)=>res.add(Document(docId:document[0].toString(),templateDoc:TemplateDocument(id: document[1][0].toString(), name: document[1][1]),particularAddress:document[3].toString(),organisationAddress:document[4].toString(),description:document[2])));
+    return res;
+  }
+
   Future<List<DocumentRequest>> getOrgRequestsReceived(EthPrivateKey credentials, String orgAddress) async {
     final contractFunction = contract.function('getOrgRequestsReceived');
     final result = await _web3Connection.client.call(
@@ -125,6 +152,7 @@ class Web3Service {
     documentRequests.forEach((document)=>res.add(DocumentRequest(docRequestId: document[0].toString(),recipient: document[1].toString(),issuer: document[2].toString(),templateDocId: document[3].toString(),status: statusFromIdentifier(document[4].toString()))));
     return res;
   }
+
   Future<void> addFavouriteOrg(EthPrivateKey credentials, String orgAddress) async {
     final contractFunction = contract.function('addFavouriteOrg');
     await _web3Connection.client.sendTransaction(

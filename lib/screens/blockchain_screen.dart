@@ -13,14 +13,14 @@ class BlockchainScreen extends StatefulWidget {
   _BlockchainScreenState createState() => _BlockchainScreenState();
 }
 
-enum SearchFilter { address, name }
+enum SearchFilter { OwnerAddress, OrgAddress, TemplateDocName }
 
 class _BlockchainScreenState extends State<BlockchainScreen> {
   late Web3Service web3Service;
-  SearchFilter selectedFilter = SearchFilter.address;
+  SearchFilter selectedFilter = SearchFilter.OwnerAddress;
   TextEditingController searchController = TextEditingController();
-  late List<Document> particularDocuments = [];
-
+  late List<Document> displayedDocuments = [];
+  late List<Document> baseDocs;
   @override
   void initState() {
     super.initState();
@@ -33,11 +33,10 @@ class _BlockchainScreenState extends State<BlockchainScreen> {
     Web3Connection web3Conn = new Web3Connection("http://127.0.0.1:7545", "ws://127.0.0.1:7545", addressPriveeServer);
     web3Service = new Web3Service(web3Conn);
     EthereumAddress contractAddr = await web3Conn.getContractAddress("DocumentsManager");
-    await web3Service.initializeContract("DocumentsManager", contractAddr);
-    List<Document> pdocs = await web3Service.getAllDocuments();
-    print(pdocs);
+    await web3Service.initializeContract("DocumentsManager", contractAddr); // Maybe show requests also
+    baseDocs = await web3Service.getAllDocuments(); // Ajouter une limite
     setState(() {
-      particularDocuments = pdocs;
+      displayedDocuments = baseDocs;
     });
   }
 
@@ -45,27 +44,46 @@ class _BlockchainScreenState extends State<BlockchainScreen> {
     final searchValue = searchController.text.trim();
 
     if (searchValue.isEmpty) {
-      // Gérer le cas où la valeur de recherche est vide.
+      setState(() {
+        displayedDocuments = baseDocs;
+      });
       return;
     }
 
-    if (selectedFilter == SearchFilter.address) {
+    if (selectedFilter == SearchFilter.OwnerAddress) {
       // Recherche par adresse
-      await exploreDataByAddress(searchValue);
-    } else {
+      await exploreDataByOwnerAddress(searchValue);
+    } else if(selectedFilter == SearchFilter.OrgAddress){
       // Recherche par nom
-      await exploreDataByName(searchValue);
+      await exploreDataByOrgAddress(searchValue);
+    }else if(selectedFilter == SearchFilter.TemplateDocName){
+      await exploreDataByTemplateDocName(searchValue);
     }
-  }
-
-  Future<void> exploreDataByAddress(String address) async {
-    List<TemplateDocument> templateDocuments = await web3Service.getOrgTemplateDocuments(address);
-
 
   }
 
-  Future<void> exploreDataByName(String name) async {
-    // ... (même code que précédemment)
+  Future<void> exploreDataByOwnerAddress(String address) async {
+    List<Document> documents = await web3Service.getParticularDocuments(address);
+
+    setState(() {
+      displayedDocuments = documents;
+    });
+    print(documents);
+
+  }
+
+  Future<void> exploreDataByOrgAddress(String address) async {
+    List<Document> orgDocuments = await web3Service.getOrgDocuments(address);
+    setState(() {
+      displayedDocuments = orgDocuments;
+    });
+  }
+
+  Future<void> exploreDataByTemplateDocName(String name) async {
+    List<Document> documents = await web3Service.getDocumentsByTemplateName(name);
+    setState(() {
+      displayedDocuments = documents;
+    });
   }
 
   @override
@@ -86,7 +104,7 @@ class _BlockchainScreenState extends State<BlockchainScreen> {
               items: SearchFilter.values
                   .map((filter) => DropdownMenuItem(
                 value: filter,
-                child: Text(filter == SearchFilter.address ? 'Adresse' : 'Nom'),
+                child: Text(filter == SearchFilter.OwnerAddress ? 'Owner address' : (filter == SearchFilter.OrgAddress ? 'Org Address': 'Template doc Name')),
               ))
                   .toList(),
             ),
@@ -94,7 +112,7 @@ class _BlockchainScreenState extends State<BlockchainScreen> {
             Expanded(
               child: TextField(
                 controller: searchController,
-                decoration: InputDecoration(labelText: selectedFilter == SearchFilter.address ? 'Adresse' : 'Nom'),
+                decoration: InputDecoration(labelText: selectedFilter == SearchFilter.OwnerAddress ? 'Owner address' : (selectedFilter == SearchFilter.OrgAddress ? 'Org Address': 'Template doc Name')),
                 onSubmitted: (value) => exploreData(),
               ),
             ),
@@ -118,14 +136,14 @@ class _BlockchainScreenState extends State<BlockchainScreen> {
     );
   }
   Widget _buildTemplateDocumentsGrid() {
-    if (particularDocuments.isEmpty) {
-      return const Center(
-        child: CircularProgressIndicator(),
+    if (displayedDocuments.isEmpty) {
+      return const Text(
+        "Aucune transaction trouvée avec les filtres courant"
       );
     } else {
       return ListView.builder(
         scrollDirection: Axis.horizontal, // Définissez la direction de défilement sur horizontal
-        itemCount: particularDocuments.length,
+        itemCount: displayedDocuments.length,
         itemBuilder: (context, index) {
           return Row(
             children: [Container(
@@ -139,15 +157,15 @@ class _BlockchainScreenState extends State<BlockchainScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('docId: ${particularDocuments[index].docId}'),
+                  Text('docId: ${displayedDocuments[index].docId}'),
                   SizedBox(height: 8.0),
-                  Text('templateDoc: ${particularDocuments[index].templateDoc}'),
+                  Text('templateDoc: ${displayedDocuments[index].templateDoc}'),
                   SizedBox(height: 8.0),
-                  Text('description: ${particularDocuments[index].description}'),
+                  Text('description: ${displayedDocuments[index].description}'),
                   SizedBox(height: 8.0),
-                  Text('owner: ${particularDocuments[index].particularAddress}'),
+                  Text('owner: ${displayedDocuments[index].particularAddress}'),
                   SizedBox(height: 8.0),
-                  Text('org transmitter: ${particularDocuments[index].organisationAddress}'),
+                  Text('org transmitter: ${displayedDocuments[index].organisationAddress}'),
                 ],
               ),
             ),
