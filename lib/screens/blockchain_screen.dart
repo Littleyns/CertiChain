@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:web3dart/web3dart.dart';
 import 'package:http/http.dart';
 
@@ -29,7 +30,7 @@ class _BlockchainScreenState extends State<BlockchainScreen> {
 
   }
   Future<void> _initializationAsync() async {
-    String addressPriveeServer = "0x85289cd8817f6df013284fb557cfdb5b9feada4f9556be58594c2c9ac2afe970";
+    String addressPriveeServer = dotenv.get('PKEY_SERVER');
     Web3Connection web3Conn = new Web3Connection("http://127.0.0.1:7545", "ws://127.0.0.1:7545", addressPriveeServer);
     web3Service = new Web3Service(web3Conn);
     EthereumAddress contractAddr = await web3Conn.getContractAddress("DocumentsManager");
