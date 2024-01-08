@@ -4,3 +4,4 @@ class Organisation {
 
   Organisation({required this.orgAddress, required this.name});
 }
+
