@@ -1,8 +1,11 @@
 // web3_service.dart
 import 'package:chatflutter/models/Document.dart';
+import 'package:chatflutter/models/DocumentRequest.dart';
 import 'package:chatflutter/models/TemplateDocument.dart';
 import 'package:chatflutter/services/web3_connection.dart';
 import 'package:web3dart/web3dart.dart';
+
+import '../models/Consts.dart';
 
 class Web3Service {
   late Web3Connection _web3Connection;
@@ -92,7 +95,7 @@ class Web3Service {
 
     final documents = result[0].toList();
     List<Document> res = [];
-    documents.forEach((document)=>res.add(Document(docId:document[0].toString(),templateDoc:TemplateDocument(id: document[1][0].toString(), name: document[1][1]),description:document[2])));
+    documents.forEach((document)=>res.add(Document(docId:document[0].toString(),templateDoc:TemplateDocument(id: document[1][0].toString(), name: document[1][1]),particularAddress:document[3].toString(),organisationAddress:document[4].toString(),description:document[2])));
     return res;
   }
   Future<List<Document>> getParticularDocuments(String particularAddress) async {
@@ -105,9 +108,51 @@ class Web3Service {
 
     final documents = result[0].toList();
     List<Document> res = [];
-    documents.forEach((document)=>res.add(Document(docId:document[0].toString(),templateDoc:TemplateDocument(id: document[1][0].toString(), name: document[1][1]),description:document[2])));
+    documents.forEach((document)=>res.add(Document(docId:document[0].toString(),templateDoc:TemplateDocument(id: document[1][0].toString(), name: document[1][1]),particularAddress:document[3].toString(),organisationAddress:document[4].toString(),description:document[2])));
     return res;
   }
+
+  Future<List<Document>> getDocumentsByTemplateName(String templateName) async {
+    final contractFunction = contract.function('getDocumentsByTemplateName');
+    final result = await _web3Connection.client.call(
+      contract: contract,
+      function: contractFunction,
+      params: [templateName],
+    );
+    final documents = result[0].toList();
+    List<Document> res = [];
+    documents.forEach((document)=>res.add(Document(docId:document[0].toString(),templateDoc:TemplateDocument(id: document[1][0].toString(), name: document[1][1]),particularAddress:document[3].toString(),organisationAddress:document[4].toString(),description:document[2])));
+    return res;
+  }
+    Future<List<Document>> getOrgDocuments(String orgAddress) async {
+      final contractFunction = contract.function('getOrgDocuments');
+      final result = await _web3Connection.client.call(
+        contract: contract,
+        function: contractFunction,
+        params: [EthereumAddress.fromHex(orgAddress)],
+      );
+
+    final documents = result[0].toList();
+    List<Document> res = [];
+    documents.forEach((document)=>res.add(Document(docId:document[0].toString(),templateDoc:TemplateDocument(id: document[1][0].toString(), name: document[1][1]),particularAddress:document[3].toString(),organisationAddress:document[4].toString(),description:document[2])));
+    return res;
+  }
+
+  Future<List<DocumentRequest>> getOrgRequestsReceived(EthPrivateKey credentials, String orgAddress) async {
+    final contractFunction = contract.function('getOrgRequestsReceived');
+    final result = await _web3Connection.client.call(
+      contract: contract,
+      function: contractFunction,
+      sender: credentials.address,
+      params: [EthereumAddress.fromHex(orgAddress)],
+    );
+
+    final documentRequests = result[0].toList();
+    List<DocumentRequest> res = [];
+    documentRequests.forEach((document)=>res.add(DocumentRequest(docRequestId: document[0].toString(),recipient: document[1].toString(),issuer: document[2].toString(),templateDocId: document[3].toString(),status: statusFromIdentifier(document[4].toString()))));
+    return res;
+  }
+
   Future<void> addFavouriteOrg(EthPrivateKey credentials, String orgAddress) async {
     final contractFunction = contract.function('addFavouriteOrg');
     await _web3Connection.client.sendTransaction(

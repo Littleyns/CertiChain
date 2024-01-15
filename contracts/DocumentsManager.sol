@@ -39,6 +39,8 @@ contract DocumentsManager {
     uint256 docId;
     TemplateDocument templateDoc;
     string description;
+    address particularAddress;
+    address organisationAddress;
 
   }
   struct Organisation {
@@ -65,6 +67,10 @@ contract DocumentsManager {
   mapping(uint256 => DocumentRequest) public docRequests; // Demandes de documents d'un particulier à un organisme
   mapping(uint256 => GrantRequest) public grantRequests; // Attributions d'un document par un organisme à un particulier
 
+  // shortcut mappings
+  mapping(address => Document[]) public documentsByOrganism;
+
+  ////////////////////
   event DocumentCreated(address orgAddress, uint256 docId);
 
   event DocumentGranted(
@@ -146,27 +152,21 @@ contract DocumentsManager {
   ) external onlyOrg { // Demande à un particulier l'attribution d'un document
     // vérifier que la templateDoc existe et qu'il appartient à l'organisation
     // Créez une demande d'attribution
-    Document memory grantedDoc = Document({
-    docId: nextDocumentId,
-    templateDoc: templateDocuments[_templateDocId],
-    description: "haha this is a document"
-    });
-    nextDocumentId++;
+    Document memory grantedDoc = createDocument(templateDocuments[_templateDocId], "testdesc",_particularAddress, msg.sender );
+
 
     GrantRequest memory newRequest = GrantRequest({
     grantRequestId: nextGrantRequestId,
     recipient: _particularAddress,
     issuer: msg.sender,
-    docId: nextDocumentId,
+    docId: grantedDoc.docId,
     status: DocumentTransactionStatus.Pending
     });
     nextGrantRequestId++;
 
     // persistence
     organisations[msg.sender].documentRequestsGranted.push(newRequest);
-    particulars[_particularAddress].documentRequestsReceived.push(newRequest);
     grantRequests[newRequest.grantRequestId] = newRequest;
-    documents[grantedDoc.docId] = grantedDoc;
 
     // Émettez un événement pour notifier la demande
     // pas bon event ! emit DocumentGranted(msg.sender, _particularAddress, _templateDocId);
@@ -180,29 +180,12 @@ contract DocumentsManager {
     // vérifier que la templateDoc existe et qu'il appartient à l'organisation
     DocumentRequest memory docRequest = docRequests[_docRequestId];
     //Création d'un document à partir du template
-    Document memory grantedDoc = Document({
-    docId: nextDocumentId,
-    templateDoc: templateDocuments[docRequest.templateDocId],
-    description: "haha this is a document"
-    });
-    nextDocumentId++;
+    Document memory grantedDoc = createDocument(templateDocuments[docRequest.templateDocId], "test description", docRequest.issuer, msg.sender);
 
-    //Création d'une requete d'attribution
-    GrantRequest memory newRequest = GrantRequest({
-    grantRequestId: nextGrantRequestId,
-    recipient: docRequest.issuer,
-    issuer: msg.sender,
-    docId: grantedDoc.docId,
-    status: DocumentTransactionStatus.Approved
-    });
-    nextGrantRequestId++;
 
     // Persistence
-    organisations[msg.sender].documentRequestsGranted.push(newRequest);
-    particulars[docRequest.issuer].documentRequestsReceived.push(newRequest);
+
     particulars[docRequest.issuer].documents.push(grantedDoc);
-    grantRequests[newRequest.grantRequestId] = newRequest;
-    documents[grantedDoc.docId] = grantedDoc;
     docRequest.status = DocumentTransactionStatus.Approved;
 
     // si le template id correspond changer le status de la requete ou l'effacer
@@ -213,14 +196,11 @@ contract DocumentsManager {
     GrantRequest storage grantRequest = grantRequests[_grantRequestId];
 
     // Vérifier que le particulier est le destinataire de la demande
-    require(msg.sender == grantRequest.recipient, "You are not the recipient of this document grant");
-
-    // Vérifier que la demande est en attente
-    require(grantRequest.status == DocumentTransactionStatus.Pending, "Document grant is not pending");
+    require(msg.sender == grantRequest.recipient && grantRequest.status == DocumentTransactionStatus.Pending, "bad request");
 
     // Mettre à jour le statut de la demande d'attribution
     grantRequest.status = DocumentTransactionStatus.Rejected;
-
+    // !! effacer le document créé
     // Émettre un événement pour notifier le rejet de la demande
     emit DocumentGranted(grantRequest.issuer, msg.sender, grantRequest.docId);
   }
@@ -251,7 +231,6 @@ contract DocumentsManager {
   }
   function acceptGrantedDocument(uint256 _grantRequestId)
   external
-  view
   onlyParticular
   {
     // vérifier que la templateDoc existe et qu'il appartient à l'organisation
@@ -260,6 +239,8 @@ contract DocumentsManager {
     // Persistence
     grantRequest.status = DocumentTransactionStatus.Approved;
 
+    particulars[msg.sender].documents.push(documents[grantRequest.docId]);
+
     // si le template id correspond changer le status de la requete ou l'effacer
     // Émettre l'événement d'approbation du document
   }
@@ -267,10 +248,7 @@ contract DocumentsManager {
     DocumentRequest storage docRequest = docRequests[_docRequestId];
 
     // Vérifier que l'organisme est l'émetteur de la demande
-    require(msg.sender == docRequest.issuer, "You are not the issuer of this document request");
-
-    // Vérifier que la demande est en attente
-    require(docRequest.status == DocumentTransactionStatus.Pending, "Document request is not pending");
+    require(msg.sender == docRequest.issuer && docRequest.status == DocumentTransactionStatus.Pending, "bad request");
 
     // Mettre à jour le statut de la demande d'attribution
     docRequest.status = DocumentTransactionStatus.Rejected;
@@ -279,14 +257,54 @@ contract DocumentsManager {
     emit DocumentRequested(msg.sender, docRequest.recipient, docRequest.templateDocId);
   }
 
+  // Utilities
+  function createDocument(TemplateDocument memory _templateDoc, string memory _description, address _particularAddress, address _orgAddress) public returns(Document memory){
+    Document memory newDocument = Document({
+    docId: nextDocumentId,
+    templateDoc: _templateDoc,
+    particularAddress: _particularAddress,
+    organisationAddress: _orgAddress,
+    description: _description
+    });
+
+    //  persistence
+    documentsByOrganism[msg.sender].push(newDocument);
+    documents[nextDocumentId] = newDocument;
+
+    nextDocumentId++;
+    return newDocument;
+  }
 
   // Getters
 
   function getOrgTemplateDocuments(address _orgAddress) external view returns (TemplateDocument[] memory) {
     return organisations[_orgAddress].templateDocuments;
   }
+
+  function getOrgDocuments(address _orgAddress) external view returns (Document[] memory) {
+    return documentsByOrganism[_orgAddress];
+  }
   function getParticularDocuments(address _particularAddress) external view returns (Document[] memory) {
     return particulars[_particularAddress].documents;
+  }
+  function getDocumentsByTemplateName(string memory _templateDocName) external view returns (Document[] memory) {
+    Document[] memory res = new Document[](nextDocumentId);
+    bytes memory templateDocNameBytes = bytes(_templateDocName);
+    uint256 resultIndex = 0;
+
+    for (uint256 i = 0; i < nextDocumentId; i++) {
+      if (keccak256(bytes(documents[i].templateDoc.name)) == keccak256(templateDocNameBytes)) {
+        res[resultIndex] = documents[i];
+        resultIndex++;
+      }
+    }
+
+    // Redimensionner le tableau pour éliminer les éléments non utilisés
+    assembly {
+      mstore(res, resultIndex)
+    }
+
+    return res;
   }
 
   function getAllParticularDocuments() external view returns (Document[] memory) {
@@ -295,6 +313,14 @@ contract DocumentsManager {
       res[i] = documents[i];
     }
     return res;
+  }
+
+  function getOrgRequestsReceived(address _orgAddress) external view returns(DocumentRequest[] memory){
+    require(
+      msg.sender == owner || msg.sender == _orgAddress,
+      "bad sender"
+    );
+    return organisations[msg.sender].documentRequestsReceived;
   }
 
   function getFavouriteOrgs()
