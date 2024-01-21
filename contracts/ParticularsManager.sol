@@ -52,6 +52,17 @@ contract ParticularsManager {
     function addFavouriteOrg(address _orgAddress) external onlyParticular {
         particulars[msg.sender].favouriteOrgs.push(_orgAddress);
     }
+    function removeFavouriteOrg(address _orgAddress) external onlyParticular {
+        address[] storage favouriteOrgs = particulars[msg.sender].favouriteOrgs;
+        for (uint256 i = 0; i < favouriteOrgs.length; i++) {
+            if (favouriteOrgs[i] == _orgAddress) {
+                favouriteOrgs[i] = favouriteOrgs[favouriteOrgs.length - 1];
+                favouriteOrgs.pop();
+                return;
+            }
+        }
+        revert("Organization not found in favourites");
+    }
     function addDocRequestSended(uint256 requestId,address particularAddress) external {
         particulars[particularAddress].documentRequestsSended.push(requestId);
     }

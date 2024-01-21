@@ -81,6 +81,19 @@ class ParticularsManagerService {
       fetchChainIdFromNetworkId: false,
     );
   }
+  Future<void> removeFavouriteOrg(EthPrivateKey credentials, String orgAddress) async {
+    final contractFunction = contract.function('removeFavouriteOrg');
+    await _web3Connection.client.sendTransaction(
+      credentials,
+      Transaction.callContract(
+        contract: contract,
+        function: contractFunction,
+        parameters: [EthereumAddress.fromHex(orgAddress)],
+      ),
+      chainId: 1337,
+      fetchChainIdFromNetworkId: false,
+    );
+  }
 
 
 }
