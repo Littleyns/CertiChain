@@ -8,6 +8,7 @@ class Document {
   String description;
   String organisationEmitter;
   String ParticularOwner;
+  BigInt expirationDate;
 
   Document({ // Modifier par un DTO dans solidity qui contient directement les champs qui nous interesse en UI
     required this.docId,
@@ -15,6 +16,7 @@ class Document {
     required this.description,
     required this.organisationEmitter,
     required this.ParticularOwner,
+    required this.expirationDate,
   });
 
 
@@ -23,13 +25,14 @@ class Document {
         templateDocName = json[1].toString() as String,
         description = json[2].toString() as String,
         organisationEmitter = json[3].toString()as String ,
-        ParticularOwner = json[4].toString() as String;
+        ParticularOwner = json[4].toString() as String,
+        expirationDate = json[5] as BigInt;
 
 
 
   @override
   String toString() {
-    return "Template Doc: ${templateDocName} | ID: ${docId} | description: ${description} | owner: ${ParticularOwner} | org transmitter ${organisationEmitter}" ;
+    return "Template Doc: ${templateDocName} | ID: ${docId} | description: ${description} | owner: ${ParticularOwner} | org transmitter ${organisationEmitter} | expiration date ${expirationDate}"  ;
   }
 
 

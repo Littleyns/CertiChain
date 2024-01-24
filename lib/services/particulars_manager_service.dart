@@ -1,6 +1,7 @@
 // web3_service.txt
 import 'package:chatflutter/models/Document.dart';
 import 'package:chatflutter/models/DocumentRequest.dart';
+import 'package:chatflutter/models/GrantRequest.dart';
 import 'package:chatflutter/models/TemplateDocument.dart';
 import 'package:chatflutter/services/web3_connection.dart';
 import 'package:web3dart/web3dart.dart';
@@ -65,6 +66,32 @@ class ParticularsManagerService {
     final documents = result[0].toList();
     List<Document> res = [];
     documents.forEach((document)=>res.add(Document.fromJson(document)));
+    return res;
+  }
+  Future<List<DocumentRequest>> getAllParticularDocRequests(String particularAddress) async {
+    final contractFunction = contract.function('getAllParticularDocRequests');
+    final result = await _web3Connection.client.call(
+      contract: contract,
+      function: contractFunction,
+      params: [EthereumAddress.fromHex(particularAddress)],
+    );
+
+    final docRequests = result[0].toList();
+    List<DocumentRequest> res = [];
+    docRequests.forEach((docRequest)=>res.add(DocumentRequest.fromJson(docRequest)));
+    return res;
+  }
+  Future<List<GrantRequest>> getAllParticularDocGrantRequests(String particularAddress) async {
+    final contractFunction = contract.function('getAllParticularDocGrantRequests');
+    final result = await _web3Connection.client.call(
+      contract: contract,
+      function: contractFunction,
+      params: [EthereumAddress.fromHex(particularAddress)],
+    );
+
+    final grantRequests = result[0].toList();
+    List<GrantRequest> res = [];
+    grantRequests.forEach((grantRequest)=>res.add(GrantRequest.fromJson(grantRequest)));
     return res;
   }
 

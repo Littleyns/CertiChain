@@ -173,6 +173,8 @@ class _BlockchainScreenState extends State<BlockchainScreen> {
                   Text('owner: ${displayedDocuments[index].ParticularOwner}'),
                   SizedBox(height: 8.0),
                   Text('org transmitter: ${displayedDocuments[index].organisationEmitter}'),
+                  SizedBox(height: 8.0),
+                  Text('Expiration date: ${displayedDocuments[index].expirationDate.toInt() == -1 ? "-": new DateTime.fromMicrosecondsSinceEpoch(displayedDocuments[index].expirationDate.toInt())}'),
                 ],
               ),
             ),

@@ -54,7 +54,13 @@ contract RequestsManager {
         uint256 docId;
         DocumentTransactionStatus status;
     }
-
+    struct GrantRequestDTO {
+        uint256 grantRequestId;
+        string recipientName;
+        string issuerName;
+        DocumentsManager.DocumentDTO doc;
+        DocumentTransactionStatus status;
+    }
     mapping(uint256 => DocumentRequest) public docRequests; // Demandes de documents d'un particulier à un organisme
     mapping(uint256 => GrantRequest) public grantRequests; // Attributions d'un document par un organisme à un particulier
 
@@ -74,18 +80,20 @@ contract RequestsManager {
   }
     function requestDocumentGrant(
         address _particularAddress,
-        uint256 _templateDocId
+        uint256 _templateDocId,
+        string memory description,
+        int expirationDate
     ) external onlyOrg { // Demande à un particulier l'attribution d'un document
         // vérifier que la templateDoc existe et qu'il appartient à l'organisation
         // Créez une demande d'attribution
-        DocumentsManager.Document memory grantedDoc = docContract.createDocument(_templateDocId, "testdesc",_particularAddress, msg.sender );
+        DocumentsManager.Document memory grantedPendingDoc = docContract.createPendingDocument(_templateDocId, description,_particularAddress, msg.sender,expirationDate );
 
 
         GrantRequest memory newRequest = GrantRequest({
         grantRequestId: nextGrantRequestId,
         recipient: _particularAddress,
         issuer: msg.sender,
-        docId: grantedDoc.docId,
+        docId: grantedPendingDoc.docId,
         status: DocumentTransactionStatus.Pending
         });
         
@@ -101,12 +109,15 @@ contract RequestsManager {
     }
 
     function acceptDocumentRequest(
-        uint256 _docRequestId
+        uint256 _docRequestId,
+        string memory description,
+        int expirationDate
+
     ) external onlyOrg { // Accepte la requete d'un particulier
         // vérifier que la templateDoc existe et qu'il appartient à l'organisation
         DocumentRequest memory docRequest = docRequests[_docRequestId];
         //Création d'un document à partir du template
-        DocumentsManager.Document memory grantedDoc = docContract.createDocument(docRequest.templateDocId, "test description", docRequest.issuer, msg.sender);
+        DocumentsManager.Document memory grantedDoc = docContract.createDocument(docRequest.templateDocId, description, docRequest.issuer, msg.sender,expirationDate);
 
 
         // Persistence
@@ -164,6 +175,7 @@ contract RequestsManager {
         // Persistence
         grantRequest.status = DocumentTransactionStatus.Approved;
 
+        docContract.transferFromPendingToDelivered(grantRequest.docId);
         particularsContract.addDocToParticular(grantRequest.docId,msg.sender);
 
         // si le template id correspond changer le status de la requete ou l'effacer
@@ -192,7 +204,15 @@ contract RequestsManager {
         templateDocName:docContract.getTemplateDocument(docRequests[i].templateDocId).name,
         status:docRequests[i].status});
     }
-        function getGrantRequest(uint256 i) external view returns (GrantRequest memory) {
+
+    function getGrantRequestDTO(uint256 i) external view returns (GrantRequestDTO memory) {
+        return  GrantRequestDTO({grantRequestId:grantRequests[i].grantRequestId,
+        recipientName:particularsContract.getParticular(grantRequests[i].recipient).username,
+        issuerName: orgContract.getOrganisation(grantRequests[i].issuer).name,
+        doc:docContract.getDocumentDTO(grantRequests[i].docId),
+        status:grantRequests[i].status});
+    }
+    function getGrantRequest(uint256 i) external view returns (GrantRequest memory) {
         return grantRequests[i];
     }
 
