@@ -75,7 +75,7 @@ void main() async {
 
   // acceptation tout les requetes par 3iL
   for(int i = 0; i< docRequests.length;i++){
-    await requestsService.acceptDocumentRequest(EthPrivateKey.fromHex(adressePriveeOrganisation),docRequests[i].docRequestId); // changer l'id, récuperer toutes les requetes d'un utilisateur
+    await requestsService.acceptDocumentRequest(EthPrivateKey.fromHex(adressePriveeOrganisation),docRequests[i].docRequestId, "well deserved doc", BigInt.from(-1)); // changer l'id, récuperer toutes les requetes d'un utilisateur
     print("Document accepted from organisation");
   }
 

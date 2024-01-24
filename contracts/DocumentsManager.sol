@@ -33,6 +33,7 @@ contract DocumentsManager {
         string description;
         address particularAddress;
         address organisationAddress;
+        int expirationDate;
 
     }
     struct DocumentDTO {
@@ -41,9 +42,11 @@ contract DocumentsManager {
         string description;
         string organisationName;
         string particularName;
+        int expirationDate;
     }
     mapping(uint256 => TemplateDocument) public templateDocuments;
     mapping(uint256 => Document) public documents;
+    mapping(uint256 => Document) public pendingToGrant;
 
   modifier onlyOrg() {
     require(
@@ -72,13 +75,14 @@ contract DocumentsManager {
     }
 
 
-    function createDocument(uint256 _templateDocId, string memory _description, address _particularAddress, address _orgAddress) public returns(Document memory){
+    function createDocument(uint256 _templateDocId, string memory _description, address _particularAddress, address _orgAddress, int _expirationDate) public returns(Document memory){
         Document memory newDocument = Document({
         docId: nextDocumentId,
         templateDocId: _templateDocId,
         particularAddress: _particularAddress,
         organisationAddress: _orgAddress,
-        description: _description
+        description: _description,
+        expirationDate: _expirationDate
         });
 
         //  persistence
@@ -88,6 +92,27 @@ contract DocumentsManager {
         nextDocumentId++;
         return newDocument;
     }
+    function createPendingDocument(uint256 _templateDocId, string memory _description, address _particularAddress, address _orgAddress, int _expirationDate) public returns(Document memory){
+        Document memory newDocument = Document({
+        docId: nextDocumentId,
+        templateDocId: _templateDocId,
+        particularAddress: _particularAddress,
+        organisationAddress: _orgAddress,
+        description: _description,
+        expirationDate: _expirationDate
+        });
+
+        //  persistence
+
+        pendingToGrant[nextDocumentId] = newDocument;
+
+        nextDocumentId++;
+        return newDocument;
+    }
+
+    function transferFromPendingToDelivered(uint256 docId) public {
+        documents[docId] = pendingToGrant[docId];
+    }
 
     function getTemplateDocument(uint256 i) external view returns (TemplateDocument memory) {
         return templateDocuments[i];
@@ -96,7 +121,7 @@ contract DocumentsManager {
         return documents[i];
     }
     function getDocumentDTO(uint256 i) external view returns (DocumentDTO memory) {
-        return DocumentDTO({docId:documents[i].docId, templateDocName:templateDocuments[documents[i].templateDocId].name, description: documents[i].description, organisationName:orgContract.getOrganisation(documents[i].organisationAddress).name, particularName:particularsContract.getParticular(documents[i].particularAddress).username});
+        return DocumentDTO({docId:documents[i].docId, templateDocName:templateDocuments[documents[i].templateDocId].name, description: documents[i].description, organisationName:orgContract.getOrganisation(documents[i].organisationAddress).name, particularName:particularsContract.getParticular(documents[i].particularAddress).username,expirationDate: documents[i].expirationDate});
     }
     function getDocumentsByTemplateName(string memory _templateDocName) external view returns (DocumentDTO[] memory) {
         DocumentDTO[] memory res = new DocumentDTO[](nextDocumentId);
