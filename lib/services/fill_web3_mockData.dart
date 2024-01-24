@@ -10,7 +10,7 @@ import '../models/Document.dart';
 void main() async {
   // Right before you would be doing any loading
   WidgetsFlutterBinding.ensureInitialized();
-  String addressPriveeServer = "0x85289cd8817f6df013284fb557cfdb5b9feada4f9556be58594c2c9ac2afe970";
+  String addressPriveeServer = "0xea40a2a81abad9f80697273a06b0120771f2dcdf9dd97e130a87c88a35f6ec66";
   Web3Connection web3Conn = new Web3Connection("http://127.0.0.1:7545", "ws://127.0.0.1:7545", addressPriveeServer);
   Web3Service web3Service = new Web3Service(web3Conn);
   EthereumAddress contractAddr = await web3Conn.getContractAddress("DocumentsManager");
@@ -18,21 +18,21 @@ void main() async {
   await web3Service.initializeContract("DocumentsManager", contractAddr);
 
   // Création d'organisations
-  String adressePubliqueOrganisation = "0xdA6Bb12d7C02565df8C4dC1C86A881aa2597d2F0";
-  String adressePriveeOrganisation = "0xa69668c0758e18e4a1ed504b27bb57e6fb4d4c8a39a64ef92b0747e0f0ec2751";
+  String adressePubliqueOrganisation = "0x47a25e9481E001b1bDBeaB869561C9707F2f922B";
+  String adressePriveeOrganisation = "0xb11a6d990e8ec3189045db3125f51ddf76a48d4ec1d076284246ca86a722eef6";
   await web3Service.createOrganisation(web3Conn.creds, adressePubliqueOrganisation, "Organisation 1");
   String orgName = await web3Service.getOrganisationName(adressePubliqueOrganisation);
   print(orgName+" Created");
 
 
   // création d'un particulier
-  String adressePubliqueParticulier = "0xDd0719e04aba937706AceB33AB7124a5C82015dC";
-  String adressePriveeParticulier = "0x25f07dffc01add33580be7cfd168de14a2ed6204f3b76fe4b590180f30d28804";
+  String adressePubliqueParticulier = "0x1C83F5bF35A80Bc1Cc02c85c668832a4615a32bd";
+  String adressePriveeParticulier = "0x43d27c28420212fd8172b28ca82b6e33b26d6ebb3967a0cc7128b58844be7bff";
   await web3Service.createParticular(EthPrivateKey.fromHex(adressePriveeParticulier), adressePubliqueParticulier, "toto");
 
   // création d'un autre particulier
-  String adressePubliqueParticulier2 = "0xce65F53487f121D7054b5b2feF7e691B3564036a";
-  String adressePriveeParticulier2 = "0x950ac78ce1746778732c25f71a7b272acd465167b75f583f7d09f110010ce642";
+  String adressePubliqueParticulier2 = "0x42164E78e298E98500437666A3a84D885FdEf020";
+  String adressePriveeParticulier2 = "0x84ce07483033938c9f96ed7ac3efc8add8778beaed03fb5d5e1692aa84de2cdf";
   await web3Service.createParticular(EthPrivateKey.fromHex(adressePriveeParticulier2), adressePubliqueParticulier2, "tata");
 
   //Création de templates de document

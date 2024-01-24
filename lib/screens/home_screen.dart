@@ -1,4 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:chatflutter/models/ElevatedButtonBuilder.dart';
+import 'package:chatflutter/services/web3_connection.dart';
+import 'package:chatflutter/services/web3_service.dart';
+import 'package:flutter/widgets.dart' show WidgetsFlutterBinding;
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:web3dart/credentials.dart';
+
+import '../models/DocumentRequest.dart';
+import '../models/TemplateDocument.dart';
+import '../models/Document.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -13,7 +23,27 @@ class _HomeScreenState extends State<HomeScreen> {
     'Pending',
     'Favorite Organisms',
   ];
+  late Web3Service web3Service;
 
+  @override
+  void initState() {
+    super.initState();
+    _initializationAsync();
+
+
+  }
+
+  //ici je recupere la liste des docs
+
+  Future<void> _initializationAsync() async {
+    String addressPriveeServer = dotenv.get('PKEY_SERVER');
+    Web3Connection web3Conn = new Web3Connection("http://127.0.0.1:7545", "ws://127.0.0.1:7545", addressPriveeServer);
+    web3Service = new Web3Service(web3Conn);
+    EthereumAddress contractAddr = await web3Conn.getContractAddress("DocumentsManager");
+    await web3Service.initializeContract("DocumentsManager", contractAddr); // Maybe show requests also
+    List<Document> documentsParticulier =await web3Service.getParticularDocuments("0x6069656dF4F61DCfe7b44573eb61660c60103e4C");
+    print("je passe ici");
+  }
 
 
   final List<Widget> _pages = [
@@ -76,47 +106,24 @@ class _HomeScreenState extends State<HomeScreen> {
             mainAxisSpacing: 16.0,
             shrinkWrap: true,
             children: [
-              ElevatedButton(
-                onPressed: () {},
-                style: ElevatedButton.styleFrom(
-                  primary: Colors.grey.withOpacity(0.8),
-                  onPrimary: Colors.white,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12.0),
-                  ),
-                ),
-                child: const Text(
-                  'Diplome d\'ingénieur d\'informatique',
-                  textAlign: TextAlign.center,
-                ),
+              ElevatedButtonBuilder.build(
+                label: 'test',
+                onPressed: () {
+
+                },
               ),
-              ElevatedButton(
-                onPressed: () {},
-                style: ElevatedButton.styleFrom(
-                  primary: Colors.black,
-                  onPrimary: Colors.white,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12.0),
-                  ),
-                ),
-                child: const Text(
-                  'Contrat d\'apprentissage visé par le CFA',
-                  textAlign: TextAlign.center,
-                ),
+              ElevatedButtonBuilder.build(
+                label: 'Contrat d\'apprentissage visé par le CFA',
+                onPressed: () {
+
+                },
+                buttonColor: Colors.grey.withOpacity(0.6),
               ),
-              ElevatedButton(
-                onPressed: () {},
-                style: ElevatedButton.styleFrom(
-                  primary: Colors.black,
-                  onPrimary: Colors.white,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12.0),
-                  ),
-                ),
-                child: const Text(
-                  'VISA Long séjour France',
-                  textAlign: TextAlign.center,
-                ),
+              ElevatedButtonBuilder.build(
+                label: 'VISA Long séjour France',
+                onPressed: () {
+
+                },
               ),
             ],
           ),
