@@ -18,8 +18,10 @@ class _CustomSearchBarState extends State<CustomSearchBar> {
               builder: (BuildContext context, SearchController controller) {
                 return SearchBar(
                   controller: controller,
+                  hintText: "Cherchez un organisme...",
                   padding: const MaterialStatePropertyAll<EdgeInsets>(
                       EdgeInsets.symmetric(horizontal: 16.0)),
+
                   onTap: () {
                     controller.openView();
 

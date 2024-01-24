@@ -1,302 +1,146 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.19;
 
+import "./OrganisationsManager.sol";
+import "./ParticularsManager.sol";
 contract DocumentsManager {
-  address public owner;
+    address public owner;
+    OrganisationsManager public orgContract;
+    ParticularsManager public particularsContract;
+    constructor() {
+        owner = msg.sender;
+    }
+        modifier onlyOwner() {
+        require(msg.sender == owner, "Not owner");
+        _;
+    }
+    function setOrgContract(address addr) external onlyOwner {
+        orgContract = OrganisationsManager(addr);
+    }
+    function setParticularsContract(address addr) external onlyOwner {
+        particularsContract = ParticularsManager(addr);
+    }
+    uint256 nextTemplateDocumentId = 0;
+    struct TemplateDocument {
+        uint256 id;
+        string name;
+    }
 
-  enum DocumentTransactionStatus {
-    Pending,
-    Approved,
-    Rejected
-  }
+     uint256 public nextDocumentId = 0;
+    struct Document {
+        uint256 docId;
+        uint256 templateDocId;
+        string description;
+        address particularAddress;
+        address organisationAddress;
+        int expirationDate;
 
-  uint256 nextDocumentRequestId = 0;
-  struct DocumentRequest {
-    uint256 docRequestId;
-    address recipient;
-    address issuer;
-    uint256 templateDocId;
-    DocumentTransactionStatus status;
-  }
-
-  uint256 nextGrantRequestId = 0;
-  struct GrantRequest {
-    uint256 grantRequestId;
-    address recipient;
-    address issuer;
-    uint256 docId;
-    DocumentTransactionStatus status;
-  }
-
-  uint256 nextTemplateDocumentId = 0;
-  struct TemplateDocument {
-    uint256 id;
-    string name;
-  }
-
-  uint256 nextDocumentId = 0;
-  struct Document {
-    uint256 docId;
-    TemplateDocument templateDoc;
-    string description;
-
-  }
-  struct Organisation {
-    address organisationAddress;
-    string name;
-    TemplateDocument[] templateDocuments;
-    DocumentRequest[] documentRequestsReceived;
-    GrantRequest[] documentRequestsGranted;
-  }
-
-  struct Particular {
-    address particularAddress;
-    string username;
-    Organisation[] favouriteOrgs;
-    DocumentRequest[] documentRequestsSended;
-    GrantRequest[] documentRequestsReceived;
-    Document[] documents;
-  }
-
-  mapping(address => Organisation) public organisations;
-  mapping(address => Particular) public particulars;
-  mapping(uint256 => TemplateDocument) public templateDocuments;
-  mapping(uint256 => Document) public documents;
-  mapping(uint256 => DocumentRequest) public docRequests; // Demandes de documents d'un particulier à un organisme
-  mapping(uint256 => GrantRequest) public grantRequests; // Attributions d'un document par un organisme à un particulier
-
-  event DocumentCreated(address orgAddress, uint256 docId);
-
-  event DocumentGranted(
-    address indexed issuer,
-    address indexed recipient,
-    uint256 docId
-  );
-  event DocumentRequested(
-    address indexed issuer,
-    address indexed recipient,
-    uint256 templateDocId
-  );
+    }
+    struct DocumentDTO {
+        uint256 docId;
+        string templateDocName;
+        string description;
+        string organisationName;
+        string particularName;
+        int expirationDate;
+    }
+    mapping(uint256 => TemplateDocument) public templateDocuments;
+    mapping(uint256 => Document) public documents;
+    mapping(uint256 => Document) public pendingToGrant;
 
   modifier onlyOrg() {
     require(
-      bytes(organisations[msg.sender].name).length != 0,
+      bytes(orgContract.getOrganisation(msg.sender).name).length != 0,
       "Only organisations can call this function"
     );
     _;
   }
-  modifier onlyOwner() {
-    require(msg.sender == owner, "Not owner");
-    _;
-  }
-  modifier onlyParticular() {
-    require(
-      bytes(particulars[msg.sender].username).length != 0,
-      "Only particulars can call this function"
-    );
-    _;
-  }
-
-  constructor() {
-    owner = msg.sender;
-  }
-
-  function addOrganisation(address _orgAddress, string memory _name)
-  external
-  onlyOwner
-  {
-    organisations[_orgAddress].name = _name;
-    organisations[_orgAddress].organisationAddress = _orgAddress;
-  }
-  function addParticular(address _particularAddress, string memory _name)
-  external
-  {
-    particulars[_particularAddress].username = _name;
-    particulars[_particularAddress].particularAddress = _particularAddress;
-  }
-
-  function addFavouriteOrg(address _orgAddress) external onlyParticular {
-    particulars[msg.sender].favouriteOrgs.push(organisations[_orgAddress]);
-  }
-
-  // Organisations Scope functions
-  function createTemplateDocument(address _orgAddress, string memory _name)
-  external
-  onlyOrg
-  {
-    TemplateDocument memory newTemplateDocument = TemplateDocument({
-    name: _name,
-    id:  nextTemplateDocumentId
-    });
-    nextTemplateDocumentId++;
+    function createTemplateDocument(address _orgAddress, string memory _name)
+    external
+    onlyOrg
+    {
+        TemplateDocument memory newTemplateDocument = TemplateDocument({
+        name: _name,
+        id:  nextTemplateDocumentId
+        });
+        
 
 
-    // persistence
-    organisations[_orgAddress].templateDocuments.push(newTemplateDocument);
-    templateDocuments[newTemplateDocument.id] = newTemplateDocument;
+        // persistence
+        orgContract.addTemplateDocumentToOrg(nextTemplateDocumentId, _orgAddress);
+        templateDocuments[newTemplateDocument.id] = newTemplateDocument;
+        nextTemplateDocumentId++;
+        //emit DocumentCreated(msg.sender, newTemplateDocument.id);
 
-    emit DocumentCreated(msg.sender, newTemplateDocument.id);
-
-  }
-
-
-  function requestDocumentGrant(
-    address _particularAddress,
-    uint256 _templateDocId
-  ) external onlyOrg { // Demande à un particulier l'attribution d'un document
-    // vérifier que la templateDoc existe et qu'il appartient à l'organisation
-    // Créez une demande d'attribution
-    Document memory grantedDoc = Document({
-    docId: nextDocumentId,
-    templateDoc: templateDocuments[_templateDocId],
-    description: "haha this is a document"
-    });
-    nextDocumentId++;
-
-    GrantRequest memory newRequest = GrantRequest({
-    grantRequestId: nextGrantRequestId,
-    recipient: _particularAddress,
-    issuer: msg.sender,
-    docId: nextDocumentId,
-    status: DocumentTransactionStatus.Pending
-    });
-    nextGrantRequestId++;
-
-    // persistence
-    organisations[msg.sender].documentRequestsGranted.push(newRequest);
-    particulars[_particularAddress].documentRequestsReceived.push(newRequest);
-    grantRequests[newRequest.grantRequestId] = newRequest;
-    documents[grantedDoc.docId] = grantedDoc;
-
-    // Émettez un événement pour notifier la demande
-    // pas bon event ! emit DocumentGranted(msg.sender, _particularAddress, _templateDocId);
+    }
 
 
-  }
+    function createDocument(uint256 _templateDocId, string memory _description, address _particularAddress, address _orgAddress, int _expirationDate) public returns(Document memory){
+        Document memory newDocument = Document({
+        docId: nextDocumentId,
+        templateDocId: _templateDocId,
+        particularAddress: _particularAddress,
+        organisationAddress: _orgAddress,
+        description: _description,
+        expirationDate: _expirationDate
+        });
 
-  function acceptDocumentRequest(
-    uint256 _docRequestId
-  ) external onlyOrg { // Accepte la requete d'un particulier
-    // vérifier que la templateDoc existe et qu'il appartient à l'organisation
-    DocumentRequest memory docRequest = docRequests[_docRequestId];
-    //Création d'un document à partir du template
-    Document memory grantedDoc = Document({
-    docId: nextDocumentId,
-    templateDoc: templateDocuments[docRequest.templateDocId],
-    description: "haha this is a document"
-    });
-    nextDocumentId++;
+        //  persistence
+        orgContract.addDocumentToOrg(nextDocumentId, msg.sender);
+        documents[nextDocumentId] = newDocument;
 
-    //Création d'une requete d'attribution
-    GrantRequest memory newRequest = GrantRequest({
-    grantRequestId: nextGrantRequestId,
-    recipient: docRequest.issuer,
-    issuer: msg.sender,
-    docId: grantedDoc.docId,
-    status: DocumentTransactionStatus.Approved
-    });
-    nextGrantRequestId++;
+        nextDocumentId++;
+        return newDocument;
+    }
+    function createPendingDocument(uint256 _templateDocId, string memory _description, address _particularAddress, address _orgAddress, int _expirationDate) public returns(Document memory){
+        Document memory newDocument = Document({
+        docId: nextDocumentId,
+        templateDocId: _templateDocId,
+        particularAddress: _particularAddress,
+        organisationAddress: _orgAddress,
+        description: _description,
+        expirationDate: _expirationDate
+        });
 
-    // Persistence
-    organisations[msg.sender].documentRequestsGranted.push(newRequest);
-    particulars[docRequest.issuer].documentRequestsReceived.push(newRequest);
-    particulars[docRequest.issuer].documents.push(grantedDoc);
-    grantRequests[newRequest.grantRequestId] = newRequest;
-    documents[grantedDoc.docId] = grantedDoc;
-    docRequest.status = DocumentTransactionStatus.Approved;
+        //  persistence
 
-    // si le template id correspond changer le status de la requete ou l'effacer
-    // Émettre l'événement d'approbation du document
-    // pas le bon event creer un event approprié ! emit DocumentGranted(docRequest.recipient, docRequest.issuer, nextDocumentId);
-  }
-  function rejectDocumentGrant(uint256 _grantRequestId) external onlyParticular {
-    GrantRequest storage grantRequest = grantRequests[_grantRequestId];
+        pendingToGrant[nextDocumentId] = newDocument;
 
-    // Vérifier que le particulier est le destinataire de la demande
-    require(msg.sender == grantRequest.recipient, "You are not the recipient of this document grant");
+        nextDocumentId++;
+        return newDocument;
+    }
 
-    // Vérifier que la demande est en attente
-    require(grantRequest.status == DocumentTransactionStatus.Pending, "Document grant is not pending");
+    function transferFromPendingToDelivered(uint256 docId) public {
+        documents[docId] = pendingToGrant[docId];
+    }
 
-    // Mettre à jour le statut de la demande d'attribution
-    grantRequest.status = DocumentTransactionStatus.Rejected;
+    function getTemplateDocument(uint256 i) external view returns (TemplateDocument memory) {
+        return templateDocuments[i];
+    }
+    function getDocument(uint256 i) external view returns (Document memory) {
+        return documents[i];
+    }
+    function getDocumentDTO(uint256 i) external view returns (DocumentDTO memory) {
+        return DocumentDTO({docId:documents[i].docId, templateDocName:templateDocuments[documents[i].templateDocId].name, description: documents[i].description, organisationName:orgContract.getOrganisation(documents[i].organisationAddress).name, particularName:particularsContract.getParticular(documents[i].particularAddress).username,expirationDate: documents[i].expirationDate});
+    }
+    function getDocumentsByTemplateName(string memory _templateDocName) external view returns (DocumentDTO[] memory) {
+        DocumentDTO[] memory res = new DocumentDTO[](nextDocumentId);
+        bytes memory templateDocNameBytes = bytes(_templateDocName);
+        uint256 resultIndex = 0;
 
-    // Émettre un événement pour notifier le rejet de la demande
-    emit DocumentGranted(grantRequest.issuer, msg.sender, grantRequest.docId);
-  }
+        for (uint256 i = 0; i < nextDocumentId; i++) {
+            TemplateDocument memory tdoc = templateDocuments[documents[i].templateDocId];
+            if (keccak256(bytes(tdoc.name)) == keccak256(templateDocNameBytes)) {
+                res[resultIndex] = this.getDocumentDTO(i);
+                resultIndex++;
+            }
+        }
 
-  // Particulars Scope functions
-  function requestDocument(address _orgAddress, uint256 _templateDocId)
-  external
-  onlyParticular
-  {
-    // vérifier que la templateDoc existe et qu'il appartient à l'organisation
-    // Créez une demande d'attribution
-    DocumentRequest memory newRequest = DocumentRequest({
-    docRequestId: nextDocumentRequestId,
-    recipient: _orgAddress,
-    issuer: msg.sender,
-    templateDocId: _templateDocId,
-    status: DocumentTransactionStatus.Pending
-    });
-    nextDocumentRequestId++;
+        // Redimensionner le tableau pour éliminer les éléments non utilisés
+        assembly {
+            mstore(res, resultIndex)
+        }
 
-    // Persistence
-    organisations[_orgAddress].documentRequestsReceived.push(newRequest);
-    particulars[msg.sender].documentRequestsSended.push(newRequest);
-    docRequests[newRequest.docRequestId] = newRequest;
-
-    // Émettre l'événement de demande de document
-    emit DocumentRequested(msg.sender, _orgAddress, _templateDocId);
-  }
-  function acceptGrantedDocument(uint256 _grantRequestId)
-  external
-  view
-  onlyParticular
-  {
-    // vérifier que la templateDoc existe et qu'il appartient à l'organisation
-    GrantRequest memory grantRequest = grantRequests[_grantRequestId];
-
-    // Persistence
-    grantRequest.status = DocumentTransactionStatus.Approved;
-
-    // si le template id correspond changer le status de la requete ou l'effacer
-    // Émettre l'événement d'approbation du document
-  }
-  function rejectDocumentRequest(uint256 _docRequestId) external onlyOrg {
-    DocumentRequest storage docRequest = docRequests[_docRequestId];
-
-    // Vérifier que l'organisme est l'émetteur de la demande
-    require(msg.sender == docRequest.issuer, "You are not the issuer of this document request");
-
-    // Vérifier que la demande est en attente
-    require(docRequest.status == DocumentTransactionStatus.Pending, "Document request is not pending");
-
-    // Mettre à jour le statut de la demande d'attribution
-    docRequest.status = DocumentTransactionStatus.Rejected;
-
-    // Émettre un événement pour notifier le rejet de la demande
-    emit DocumentRequested(msg.sender, docRequest.recipient, docRequest.templateDocId);
-  }
-
-
-  // Getters
-
-  function getOrgTemplateDocuments(address _orgAddress) external view returns (TemplateDocument[] memory) {
-    return organisations[_orgAddress].templateDocuments;
-  }
-  function getParticularDocuments(address _particularAddress) external view returns (Document[] memory) {
-    return particulars[_particularAddress].documents;
-  }
-
-  function getFavouriteOrgs()
-  external
-  view
-  onlyParticular
-  returns (Organisation[] memory)
-  {
-    return particulars[msg.sender].favouriteOrgs;
-  }
-
-  // Add functions for user to request and approve documents
+        return res;
+    }
 }

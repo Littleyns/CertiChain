@@ -1,14 +1,15 @@
 import 'package:chatflutter/screens/blockchain_screen.dart';
 import 'package:chatflutter/screens/create_screen.dart';
 import 'package:chatflutter/screens/home_screen.dart';
-import 'package:chatflutter/screens/profile_screen.dart';
+import 'package:chatflutter/screens/notifications_screen.dart';
 import 'package:chatflutter/screens/search_screen.dart';
 import 'package:chatflutter/services/web3_connection.dart';
-import 'package:chatflutter/services/web3_service.dart';
 import 'package:chatflutter/widgets/custom_searchbar.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
-void main() {
+Future<void> main() async {
+  await dotenv.load(fileName: ".env");
   runApp(const MyApp());
 }
 
@@ -75,7 +76,7 @@ class _MyHomePageState extends State<MyHomePage> {
       case 3:
         return BlockchainScreen();
       case 4:
-        return ProfileScreen();
+        return NotificationsScreen();
       default:
         return Container();
     }
@@ -83,9 +84,6 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   void initState() {
     super.initState();
-    Web3Connection web3Conn = new Web3Connection("HTTP://127.0.0.1:7545", "HTTP://10.0.2.2:7545", "0x85289cd8817f6df013284fb557cfdb5b9feada4f9556be58594c2c9ac2afe970");
-
-    Web3Service web3Service = new Web3Service(web3Conn);
 
   }
 
