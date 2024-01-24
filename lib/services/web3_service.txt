@@ -6,6 +6,7 @@ import 'package:chatflutter/services/web3_connection.dart';
 import 'package:web3dart/web3dart.dart';
 
 import '../models/Consts.dart';
+import '../models/Organisation.dart';
 
 class Web3Service {
   late Web3Connection _web3Connection;
@@ -22,7 +23,7 @@ class Web3Service {
   }
 
 
-  Future<void> createOrganisation(EthPrivateKey credentials, String orgAddress, String name) async {
+  Future<void> createOrganisation(EthPrivateKey credentials, String orgAddress, Domain d,String name) async {
     final contractFunction = contract.function('addOrganisation');
     await _web3Connection.client.sendTransaction(
       credentials,
@@ -30,7 +31,7 @@ class Web3Service {
       Transaction.callContract(
         contract: contract,
         function: contractFunction,
-        parameters: [EthereumAddress.fromHex(orgAddress), name]
+        parameters: [EthereumAddress.fromHex(orgAddress),d.index, name]
       ),
       chainId: 1337,
       fetchChainIdFromNetworkId: false
