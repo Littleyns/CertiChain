@@ -30,7 +30,7 @@ void main() async {
   // Création d'organisations
   String adressePubliqueOrganisation = "0xdA6Bb12d7C02565df8C4dC1C86A881aa2597d2F0";
   String adressePriveeOrganisation = "0xa69668c0758e18e4a1ed504b27bb57e6fb4d4c8a39a64ef92b0747e0f0ec2751";
-  await organisationsService.createOrganisation(web3Conn.creds, adressePubliqueOrganisation,Domain.Education, "Organisation 1");
+  await organisationsService.createOrganisation(web3Conn.creds, adressePubliqueOrganisation,Domain.Education, "3iL");
   String orgName = await organisationsService.getOrganisationName(adressePubliqueOrganisation);
   print(orgName+" Created");
 
@@ -82,6 +82,12 @@ void main() async {
   //Récupération des documents de l'utilisateur
   List<Document> documentsParticulier =await particularsService.getParticularDocuments(adressePubliqueParticulier);
   print(documentsParticulier);
+
+  // toto add 3il to favourite orgs
+  await particularsService.addFavouriteOrg(EthPrivateKey.fromHex(adressePriveeParticulier), adressePubliqueOrganisation);
+  List<Organisation> totoFavouriteOrgs = await particularsService.getFavouriteOrgs(EthPrivateKey.fromHex(adressePriveeParticulier));
+  print("Toto Favourite orgs:");
+  print(totoFavouriteOrgs);
 
   print("Ended...");
 }

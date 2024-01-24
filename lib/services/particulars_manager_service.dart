@@ -96,19 +96,19 @@ class ParticularsManagerService {
   }
 
 
-  Future<void> getFavouriteOrgs(EthPrivateKey credentials) async {
+  Future<List<Organisation>> getFavouriteOrgs(EthPrivateKey credentials) async {
     final contractFunction = contract.function('getFavouriteOrgs');
-    await _web3Connection.client.sendTransaction(
-        credentials,
-
-        Transaction.callContract(
-            contract: contract,
-            function: contractFunction,
-            parameters: []
-        ),
-        chainId: 1337,
-        fetchChainIdFromNetworkId: false
+    final result = await _web3Connection.client.call(
+      contract: contract,
+      function: contractFunction,
+      sender: credentials.address,
+      params: [],
     );
+
+    final organisations = result[0].toList();
+    List<Organisation> res = [];
+    organisations.forEach((org)=>res.add(Organisation.fromJson(org)));
+    return res;
   }
 
   Future<void> addFavouriteOrg(EthPrivateKey credentials, String orgAddress) async {

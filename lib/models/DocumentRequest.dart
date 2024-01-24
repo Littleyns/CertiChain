@@ -22,7 +22,7 @@ class DocumentRequest { // C'est la demande de document par un particulier à un
       : docRequestId = json[0].toString() as String,
         issuerName = json[1].toString() as String,
         recipientName = json[2].toString() as String,
-        templateDocName = json[3].toString()as String ,
-        status = statusFromIdentifier(json[4].toString().toString());
+        templateDocName = json[3].toString() as String ,
+        status = statusFromIdentifier(json[4].toString());
 
 }
