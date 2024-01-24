@@ -95,6 +95,22 @@ class ParticularsManagerService {
     return res;
   }
 
+
+  Future<void> getFavouriteOrgs(EthPrivateKey credentials) async {
+    final contractFunction = contract.function('getFavouriteOrgs');
+    await _web3Connection.client.sendTransaction(
+        credentials,
+
+        Transaction.callContract(
+            contract: contract,
+            function: contractFunction,
+            parameters: []
+        ),
+        chainId: 1337,
+        fetchChainIdFromNetworkId: false
+    );
+  }
+
   Future<void> addFavouriteOrg(EthPrivateKey credentials, String orgAddress) async {
     final contractFunction = contract.function('addFavouriteOrg');
     await _web3Connection.client.sendTransaction(
