@@ -95,17 +95,19 @@ contract ParticularsManager {
         }
         return res;
     }
-    function getAllParticularDocRequests() external view returns (RequestsManager.DocumentRequestDTO[] memory) {
-        RequestsManager.DocumentRequestDTO[] memory res = new RequestsManager.DocumentRequestDTO[](reqManager.nextDocumentRequestId());
-        for(uint256 i = 0; i< reqManager.nextDocumentRequestId(); i++){
-            res[i] = reqManager.getDocumentRequestDTO(i);
+    function getParticularDocRequests() external onlyParticular view returns (RequestsManager.DocumentRequestDTO[] memory)  {
+        uint256[] memory sendedRequestsId = particulars[msg.sender].documentRequestsSended;
+        RequestsManager.DocumentRequestDTO[] memory res = new RequestsManager.DocumentRequestDTO[](sendedRequestsId.length);
+        for(uint256 i = 0; i< sendedRequestsId.length; i++){
+            res[i] = reqManager.getDocumentRequestDTO(sendedRequestsId[i]);
         }
         return res;
     }
-    function getAllParticularDocGrantRequests() external view returns (RequestsManager.GrantRequestDTO[] memory) {
-        RequestsManager.GrantRequestDTO[] memory res = new RequestsManager.GrantRequestDTO[](docContract.nextDocumentId());
-        for(uint256 i = 0; i< reqManager.nextGrantRequestId(); i++){
-            res[i] = reqManager.getGrantRequestDTO(i);
+    function getParticularDocGrantRequests() external onlyParticular view returns (RequestsManager.GrantRequestDTO[] memory) {
+        uint256[] memory receivedRequestsId = particulars[msg.sender].documentRequestsReceived;
+        RequestsManager.GrantRequestDTO[] memory res = new RequestsManager.GrantRequestDTO[](receivedRequestsId.length);
+        for(uint256 i = 0; i< receivedRequestsId.length; i++){
+            res[i] = reqManager.getGrantRequestDTO(receivedRequestsId[i]);
         }
         return res;
     }

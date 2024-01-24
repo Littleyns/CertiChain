@@ -44,6 +44,8 @@ void main() async {
   String adressePubliqueParticulier2 = "0xce65F53487f121D7054b5b2feF7e691B3564036a";
   String adressePriveeParticulier2 = "0x950ac78ce1746778732c25f71a7b272acd465167b75f583f7d09f110010ce642";
   await particularsService.createParticular(EthPrivateKey.fromHex(adressePriveeParticulier2), adressePubliqueParticulier2, "tata");
+
+
   //Création de templates de document
   await documentsService.createTemplateDocument(EthPrivateKey.fromHex(adressePriveeOrganisation),adressePubliqueOrganisation,"Diplome d'ingénieur");
   await documentsService.createTemplateDocument(EthPrivateKey.fromHex(adressePriveeOrganisation),adressePubliqueOrganisation,"Master spécialisé en big data");
@@ -88,6 +90,10 @@ void main() async {
   List<Organisation> totoFavouriteOrgs = await particularsService.getFavouriteOrgs(EthPrivateKey.fromHex(adressePriveeParticulier));
   print("Toto Favourite orgs:");
   print(totoFavouriteOrgs);
+
+  // get toto's requests
+  List<DocumentRequest> docRequestsSended = await particularsService.getParticularDocRequestsSended(EthPrivateKey.fromHex(adressePriveeParticulier));
+  print(docRequestsSended);
 
   print("Ended...");
 }

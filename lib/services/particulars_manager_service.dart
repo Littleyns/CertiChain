@@ -68,12 +68,13 @@ class ParticularsManagerService {
     documents.forEach((document)=>res.add(Document.fromJson(document)));
     return res;
   }
-  Future<List<DocumentRequest>> getAllParticularDocRequests(String particularAddress) async {
-    final contractFunction = contract.function('getAllParticularDocRequests');
+  Future<List<DocumentRequest>> getParticularDocRequestsSended(EthPrivateKey particularCredentials) async {
+    final contractFunction = contract.function('getParticularDocRequests');
     final result = await _web3Connection.client.call(
       contract: contract,
       function: contractFunction,
-      params: [EthereumAddress.fromHex(particularAddress)],
+      sender: particularCredentials.address,
+      params: [],
     );
 
     final docRequests = result[0].toList();
@@ -81,12 +82,13 @@ class ParticularsManagerService {
     docRequests.forEach((docRequest)=>res.add(DocumentRequest.fromJson(docRequest)));
     return res;
   }
-  Future<List<GrantRequest>> getAllParticularDocGrantRequests(String particularAddress) async {
-    final contractFunction = contract.function('getAllParticularDocGrantRequests');
+  Future<List<GrantRequest>> getParticularDocGrantRequestsReceived(EthPrivateKey particularCredentials) async {
+    final contractFunction = contract.function('getParticularDocGrantRequests');
     final result = await _web3Connection.client.call(
       contract: contract,
       function: contractFunction,
-      params: [EthereumAddress.fromHex(particularAddress)],
+      sender: particularCredentials.address,
+      params: [],
     );
 
     final grantRequests = result[0].toList();
@@ -96,12 +98,12 @@ class ParticularsManagerService {
   }
 
 
-  Future<List<Organisation>> getFavouriteOrgs(EthPrivateKey credentials) async {
+  Future<List<Organisation>> getFavouriteOrgs(EthPrivateKey particularCredentials) async {
     final contractFunction = contract.function('getFavouriteOrgs');
     final result = await _web3Connection.client.call(
       contract: contract,
       function: contractFunction,
-      sender: credentials.address,
+      sender: particularCredentials.address,
       params: [],
     );
 

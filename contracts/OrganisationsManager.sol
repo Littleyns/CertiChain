@@ -44,6 +44,7 @@ contract OrganisationsManager {
     external
     onlyOwner
     {
+        require(keccak256(abi.encodePacked(organisations[_orgAddress].name)) != keccak256(abi.encodePacked(_name)), "organisation already exists");
         organisations[_orgAddress].name = _name;
         organisations[_orgAddress].organisationAddress = _orgAddress;
         organisations[_orgAddress].domain = _domain;
