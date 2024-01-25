@@ -8,6 +8,7 @@ contract ParticularsManager {
     address public owner;
     OrganisationsManager public orgContract;
     DocumentsManager public docContract;
+    RequestsManager public reqManager;
     constructor() {
         owner = msg.sender;
     }
@@ -20,6 +21,9 @@ contract ParticularsManager {
     }
         function setDocContract(address addr) external onlyOwner {
         docContract = DocumentsManager(addr);
+    }
+    function setReqContract(address addr) external onlyOwner {
+        reqManager = RequestsManager(addr);
     }
     struct Particular {
         address particularAddress;
@@ -88,6 +92,22 @@ contract ParticularsManager {
         DocumentsManager.DocumentDTO[] memory res = new DocumentsManager.DocumentDTO[](docContract.nextDocumentId());
         for(uint256 i = 0; i< docContract.nextDocumentId(); i++){
             res[i] = docContract.getDocumentDTO(i);
+        }
+        return res;
+    }
+    function getParticularDocRequests() external onlyParticular view returns (RequestsManager.DocumentRequestDTO[] memory)  {
+        uint256[] memory sendedRequestsId = particulars[msg.sender].documentRequestsSended;
+        RequestsManager.DocumentRequestDTO[] memory res = new RequestsManager.DocumentRequestDTO[](sendedRequestsId.length);
+        for(uint256 i = 0; i< sendedRequestsId.length; i++){
+            res[i] = reqManager.getDocumentRequestDTO(sendedRequestsId[i]);
+        }
+        return res;
+    }
+    function getParticularDocGrantRequests() external onlyParticular view returns (RequestsManager.GrantRequestDTO[] memory) {
+        uint256[] memory receivedRequestsId = particulars[msg.sender].documentRequestsReceived;
+        RequestsManager.GrantRequestDTO[] memory res = new RequestsManager.GrantRequestDTO[](receivedRequestsId.length);
+        for(uint256 i = 0; i< receivedRequestsId.length; i++){
+            res[i] = reqManager.getGrantRequestDTO(receivedRequestsId[i]);
         }
         return res;
     }

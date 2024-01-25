@@ -1,7 +1,7 @@
 import 'package:chatflutter/screens/blockchain_screen.dart';
 import 'package:chatflutter/screens/create_screen.dart';
 import 'package:chatflutter/screens/home_screen.dart';
-import 'package:chatflutter/screens/profile_screen.dart';
+import 'package:chatflutter/screens/notifications_screen.dart';
 import 'package:chatflutter/screens/search_screen.dart';
 import 'package:chatflutter/services/web3_connection.dart';
 import 'package:chatflutter/widgets/custom_searchbar.dart';
@@ -78,7 +78,7 @@ class _MyHomePageState extends State<MyHomePage> {
       case 3:
         return BlockchainScreen();
       case 4:
-        return ProfileScreen();
+        return NotificationsScreen();
       default:
         return Container();
     }

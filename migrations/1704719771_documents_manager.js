@@ -30,6 +30,7 @@ module.exports = async function (deployer, network, accounts) {
 
     await particularManager.setOrgContract(orgManager.address);
     await particularManager.setDocContract(docManager.address);
+    await particularManager.setReqContract(requestsManager.address);
 
     await orgManager.setReqsContract(requestsManager.address);
     await orgManager.setDocContract(docManager.address);

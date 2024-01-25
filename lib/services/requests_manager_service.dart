@@ -75,7 +75,7 @@ class RequestsManagerService {
   }
 
   Future<void> requestDocumentGrant(
-      Credentials credentials, String particularAddress, String templateDocId) async {
+      Credentials credentials, String particularAddress, String templateDocId, String description, BigInt expirationDate) async {
     final contractFunction = contract.function('requestDocumentGrant');
     await _web3Connection.client.sendTransaction(
       credentials,
@@ -85,6 +85,8 @@ class RequestsManagerService {
         parameters: [
           EthereumAddress.fromHex(particularAddress),
           BigInt.parse(templateDocId),
+          description,
+          expirationDate
         ],
       ),
         chainId: 1337,
@@ -93,7 +95,7 @@ class RequestsManagerService {
   }
 
   Future<void> acceptDocumentRequest(
-      Credentials credentials, String docRequestId) async {
+      Credentials credentials, String docRequestId, String description, BigInt expirationDate) async {
     final contractFunction = contract.function('acceptDocumentRequest');
     await _web3Connection.client.sendTransaction(
       credentials,
@@ -102,6 +104,9 @@ class RequestsManagerService {
         function: contractFunction,
         parameters: [
           BigInt.parse(docRequestId),
+          description,
+          expirationDate
+
         ],
       ),
         chainId: 1337,
