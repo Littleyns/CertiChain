@@ -100,6 +100,7 @@ contract RequestsManager {
 
         // persistence
         orgContract.addDocumentRequestGranted(msg.sender, nextGrantRequestId);
+        particularsContract.addDocRequestReceived(nextGrantRequestId,_particularAddress);
         grantRequests[newRequest.grantRequestId] = newRequest;
         nextGrantRequestId++;
         // Émettez un événement pour notifier la demande
