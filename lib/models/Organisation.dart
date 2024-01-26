@@ -29,4 +29,7 @@ class Organisation {
   String toString() {
     return "Organisation: ${name} | org Address: ${orgAddress} | domaine activite: ${domain.toString()}"  ;
   }
+
 }
+
+

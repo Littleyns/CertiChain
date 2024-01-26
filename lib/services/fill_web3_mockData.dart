@@ -4,9 +4,11 @@ import 'package:chatflutter/services/particulars_manager_service.dart';
 import 'package:chatflutter/services/requests_manager_service.dart';
 import 'package:chatflutter/services/web3_connection.dart';
 import 'package:flutter/widgets.dart' show WidgetsFlutterBinding;
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:web3dart/credentials.dart';
 
 import '../models/DocumentRequest.dart';
+import '../models/GrantRequest.dart';
 import '../models/Organisation.dart';
 import '../models/TemplateDocument.dart';
 import '../models/Document.dart';
@@ -14,8 +16,9 @@ import 'documents_manager_service.dart';
 void main() async {
   // Right before you would be doing any loading
   WidgetsFlutterBinding.ensureInitialized();
-  String addressPriveeServer = "0x85289cd8817f6df013284fb557cfdb5b9feada4f9556be58594c2c9ac2afe970";
-  Web3Connection web3Conn = new Web3Connection("http://127.0.0.1:7545", "ws://127.0.0.1:7545", addressPriveeServer);
+  await dotenv.load(fileName: ".env");
+  String addressPriveeServer = "0x69b39aa2fb86c7172d77d4b87b459ed7643c1e4b052536561e08d7d25592b373";
+  Web3Connection web3Conn = new Web3Connection("http://${dotenv.get('GANACHE_HOST')}:${dotenv.get('GANACHE_PORT')}", "ws://${dotenv.get('GANACHE_HOST')}:${dotenv.get('GANACHE_PORT')}", addressPriveeServer);
 
   OrganisationsManagerService organisationsService = new OrganisationsManagerService(web3Conn);
   RequestsManagerService requestsService = new RequestsManagerService(web3Conn);
@@ -28,27 +31,28 @@ void main() async {
   await documentsService.initializeContract();
 
   // Création d'organisations
-  String adressePubliqueOrganisation = "0xdA6Bb12d7C02565df8C4dC1C86A881aa2597d2F0";
-  String adressePriveeOrganisation = "0xa69668c0758e18e4a1ed504b27bb57e6fb4d4c8a39a64ef92b0747e0f0ec2751";
+  String adressePubliqueOrganisation = "0xA16842b28FF96Ec695008996F0D85BE705A2c4Dd";
+  String adressePriveeOrganisation = "0xf0906fd865d515fed0f4563175bfc5da0eb44cce630fac63a8ede30816d2e6ed";
   await organisationsService.createOrganisation(web3Conn.creds, adressePubliqueOrganisation,Domain.Education, "3iL");
   String orgName = await organisationsService.getOrganisationName(adressePubliqueOrganisation);
   print(orgName+" Created");
 
 
   // création d'un particulier
-  String adressePubliqueParticulier = "0xDd0719e04aba937706AceB33AB7124a5C82015dC";
-  String adressePriveeParticulier = "0x25f07dffc01add33580be7cfd168de14a2ed6204f3b76fe4b590180f30d28804";
+  String adressePubliqueParticulier = "0x0df08E74FFd70cd5D4C28D5bA6261755040E69d1";
+  String adressePriveeParticulier = "0x3537081c99dff4618e1f3de8382912a1d7ccf651ade0e015b45b79cf25808384";
   await particularsService.createParticular(EthPrivateKey.fromHex(adressePriveeParticulier), adressePubliqueParticulier, "toto");
 
   // création d'un autre particulier
-  String adressePubliqueParticulier2 = "0xce65F53487f121D7054b5b2feF7e691B3564036a";
-  String adressePriveeParticulier2 = "0x950ac78ce1746778732c25f71a7b272acd465167b75f583f7d09f110010ce642";
+  String adressePubliqueParticulier2 = "0x7e2d0b3fCdFEbd1469A779aaebb62D87d9f10fF3";
+  String adressePriveeParticulier2 = "0x9d39fd4825cd5782ad312221d7fbba40588e6f595c1f92e4f70c4e9a8ab44015";
   await particularsService.createParticular(EthPrivateKey.fromHex(adressePriveeParticulier2), adressePubliqueParticulier2, "tata");
 
 
   //Création de templates de document
   await documentsService.createTemplateDocument(EthPrivateKey.fromHex(adressePriveeOrganisation),adressePubliqueOrganisation,"Diplome d'ingénieur");
   await documentsService.createTemplateDocument(EthPrivateKey.fromHex(adressePriveeOrganisation),adressePubliqueOrganisation,"Master spécialisé en big data");
+  await documentsService.createTemplateDocument(EthPrivateKey.fromHex(adressePriveeOrganisation),adressePubliqueOrganisation,"Master spécialisé cybsecurité");
 
 
   // Récupération des documents de l'organisation
@@ -56,6 +60,7 @@ void main() async {
   print(templateDocuments);
   TemplateDocument diplomeInge = templateDocuments[0];
   TemplateDocument masterSpecialise= templateDocuments[1];
+  TemplateDocument masterCyber= templateDocuments[2];
   //Demande d'un document par toto à un organisme
   await requestsService.requestDocument(EthPrivateKey.fromHex(adressePriveeParticulier),adressePubliqueOrganisation,diplomeInge.id);
   print("Document requested from toto to 3iL");
@@ -81,6 +86,9 @@ void main() async {
     print("Document accepted from organisation");
   }
 
+  // 3il offre un master specialisé en cyber securité à toto
+  requestsService.requestDocumentGrant(EthPrivateKey.fromHex(adressePriveeOrganisation),adressePubliqueParticulier,masterCyber.id,"bien merité certifié owasp",BigInt.from(-1));
+
   //Récupération des documents de l'utilisateur
   List<Document> documentsParticulier =await particularsService.getParticularDocuments(adressePubliqueParticulier);
   print(documentsParticulier);
@@ -94,6 +102,10 @@ void main() async {
   // get toto's requests
   List<DocumentRequest> docRequestsSended = await particularsService.getParticularDocRequestsSended(EthPrivateKey.fromHex(adressePriveeParticulier));
   print(docRequestsSended);
+
+  // get toto's granted docs
+  List<GrantRequest> docRequestsReceived = await particularsService.getParticularDocGrantRequestsReceived(EthPrivateKey.fromHex(adressePriveeParticulier));
+  print(docRequestsReceived);
 
   print("Ended...");
 }

@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "Projet de développement Ethereum avec Truffle et Ganache",
   "scripts": {
-    "start-ganache": "ganache-cli --deterministic",
+    "start-ganache": "ganache-cli -s 1 -i 5777",
     "migrate": "truffle migrate --reset",
 "delay": "node delay.js",
     "start-dev": "run-p start-ganache delay migrate"

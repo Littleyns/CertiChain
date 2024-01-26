@@ -1,15 +1,22 @@
-# Utilisez l'image officielle de Flutter comme base
-FROM cirrusci/flutter:latest
+# Utilisez l'image Node.js avec Truffle installé
+FROM node:18
 
 # Définissez le répertoire de travail dans le conteneur
 WORKDIR /app
 
-# Copiez les fichiers nécessaires dans le conteneur
-COPY . /app
+# Copiez les fichiers de votre projet dans le conteneur
+COPY . .
 
-# Exécutez les commandes Flutter nécessaires (par exemple, pour construire l'application)
-RUN flutter pub get
-RUN flutter build apk
+# Installez Truffle globalement
+RUN npm install -g truffle
 
-# Commande par défaut pour démarrer l'application (ajustez en fonction de vos besoins)
-CMD ["flutter", "run"]
+EXPOSE 8545
+
+# Copiez le script de déploiement dans le conteneur
+COPY deploy.sh /app/deploy.sh
+
+# Rendre le script exécutable
+RUN chmod +x /app/deploy.sh
+
+# Exécutez le script de déploiement lors du démarrage du conteneur
+ENTRYPOINT ["sh", "/app/deploy.sh"]

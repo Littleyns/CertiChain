@@ -1,8 +1,0 @@
-# Utilisez l'image officielle Ganache CLI de Truffle
-FROM trufflesuite/ganache-cli:latest
-
-# Exposez le port par défaut de Ganache CLI
-EXPOSE 8545
-
-# Commande par défaut pour démarrer Ganache CLI
-CMD ["ganache-cli", "--port", "8545", "--hostname", "0.0.0.0","--seed","12","--networkId","5777"]
