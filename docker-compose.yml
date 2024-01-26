@@ -1,0 +1,15 @@
+version: '3'
+services:
+  ganache:
+    image: trufflesuite/ganache-cli:latest
+    ports:
+      - '8545:8545'  # Port utilisé par Ganache
+
+  truffle:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - .:/app  # Montez le répertoire de travail actuel dans le conteneur
+    depends_on:
+      - ganache  # Assurez-vous que Ganache est en cours d'exécution avant Truffle
