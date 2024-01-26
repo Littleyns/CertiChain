@@ -11,4 +11,9 @@ class Particular {
     required this.username,
     required this.favouriteOrgs,
   });
+
+  // Vérifie si l'organisme est en favori pour cet utilisateur
+  bool isFavorite(Organisation org) {
+    return favouriteOrgs.contains(org);
+  }
 }
