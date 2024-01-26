@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 
 import '../models/Document.dart';
 import '../models/Organisation.dart';
+import '../services/organisations_manager_service.dart';
 import '../services/web3_connection.dart';
-import '../services/web3_service.dart';
 
 class FormOrgScreen extends StatefulWidget {
   final Organisation selectedOrganisation;
@@ -26,7 +26,7 @@ class _FormOrgScreenState extends State<FormOrgScreen> {
   late List<Document> _documents = [];
   late String _orgAddress;
   late String _name;
-  late Web3Service _web3Service; // Ajout de la variable pour la connexion Web3
+  late OrganisationsManagerService _orgService; // Ajout de la variable pour la connexion Web3
 
   @override
   void initState() {
@@ -35,7 +35,7 @@ class _FormOrgScreenState extends State<FormOrgScreen> {
     Web3Connection web3Connection = Web3Connection('http://your_rpc_url', 'ws://your_ws_url', 'your_private_key');
     web3Connection.init();
     // Initialisation du service Web3
-    _web3Service = Web3Service(web3Connection);
+    _orgService = OrganisationsManagerService(web3Connection);
 
     _name = widget.selectedOrganisation.name;
     _getOrgDocuments();
@@ -49,7 +49,7 @@ class _FormOrgScreenState extends State<FormOrgScreen> {
     _orgAddress = widget.selectedOrganisation.orgAddress;
     try {
       List<Document> orgDocuments =
-          await _web3Service.getOrgDocuments(_orgAddress);
+          await _orgService.getOrgDocuments(_orgAddress);
       setState(() {
         _documents = orgDocuments;
       });
