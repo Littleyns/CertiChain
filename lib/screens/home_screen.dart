@@ -15,13 +15,15 @@ import '../models/TemplateDocument.dart';
 import '../models/Document.dart';
 import '../services/organisations_manager_service.dart';
 import '../services/particulars_manager_service.dart';
+import '../services/user_session.dart';
+import '../widgets/form_organisation.dart';
 import 'create_screen.dart';
 
 class HomeScreen extends StatefulWidget {
 
-  final AuthenticatedUser authenticatedUser;
 
-  const HomeScreen({Key? key, required this.authenticatedUser}) : super(key: key);
+
+  const HomeScreen({Key? key}) : super(key: key);
 
 
   @override
@@ -30,7 +32,7 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   late ParticularsManagerService particularsService;
-
+  late AuthenticatedUser authenticatedUser;
   List<Document> documentsParticulier = [];
   List<Organisation> FavouriteOrgs = [];
   List<DocumentRequest> docRequestsSended =[];
@@ -48,6 +50,12 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
+    try {
+      authenticatedUser = UserSession.currentUser;
+      // Utilisez currentUser ici
+    } catch (e) {
+      // Gérez l'erreur si aucun utilisateur n'est connecté
+    }
     _initializationAsync();
 
 
@@ -64,10 +72,10 @@ class _HomeScreenState extends State<HomeScreen> {
     EthereumAddress contractAddr = await web3Conn.getContractAddress("DocumentsManager");
 
     //initialisation liste
-    List<Document> documentsParticulier =await particularsService.getParticularDocuments(widget.authenticatedUser.publicKey);
-    List<Organisation> FavouriteOrgs = await particularsService.getFavouriteOrgs(EthPrivateKey.fromHex(widget.authenticatedUser.privateKey));
-    List<DocumentRequest> docRequestsSended = await particularsService.getParticularDocRequestsSended(EthPrivateKey.fromHex(widget.authenticatedUser.privateKey));
-    List<GrantRequest> docRequests = await particularsService.getParticularDocGrantRequestsReceived(EthPrivateKey.fromHex(widget.authenticatedUser.privateKey));
+    List<Document> documentsParticulier =await particularsService.getParticularDocuments(authenticatedUser.publicKey);
+    List<Organisation> FavouriteOrgs = await particularsService.getFavouriteOrgs(EthPrivateKey.fromHex(authenticatedUser.privateKey));
+    List<DocumentRequest> docRequestsSended = await particularsService.getParticularDocRequestsSended(EthPrivateKey.fromHex(authenticatedUser.privateKey));
+    List<GrantRequest> docRequests = await particularsService.getParticularDocGrantRequestsReceived(EthPrivateKey.fromHex(authenticatedUser.privateKey));
 
     // Ajouter une limite
     baseDocs = await particularsService.getAllParticularsDocuments();
@@ -150,81 +158,87 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   static Widget _buildPage1(List<Document> documentsParticulier, BuildContext context) {
-    return Container(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [
-          const SizedBox(height: 20),
-          GridView.count(
-            crossAxisCount: 2,
-            crossAxisSpacing: 16.0,
-            mainAxisSpacing: 16.0,
-            shrinkWrap: true,
-            children: ElevatedButtonBuilder.buildButtons(
-              documents: documentsParticulier,
-              onPressed: (Document documentsParticulier) {
+    return
 
-              },
+      SingleChildScrollView(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            const SizedBox(height: 20),
+            GridView.count(
+              crossAxisCount: 2,
+              crossAxisSpacing: 16.0,
+              mainAxisSpacing: 16.0,
+              shrinkWrap: true,
+              physics: NeverScrollableScrollPhysics(),
+              children: ElevatedButtonBuilder.buildButtons(
+                documents: documentsParticulier,
+                onPressed: (Document document) {
+                  // Action lors du clic sur un bouton
+                },
+              ),
             ),
-            ),
-
-        ],
-      ),
-    );
+          ],
+        ),
+      );
   }
   static Widget _buildPage2(List<DocumentRequest> request, BuildContext context) {
 
-    return Container(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [
-          const SizedBox(height: 20),
-          GridView.count(
-            crossAxisCount: 2,
-            crossAxisSpacing: 16.0,
-            mainAxisSpacing: 16.0,
-            shrinkWrap: true,
+    return SingleChildScrollView(
+      child: Container(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            const SizedBox(height: 20),
+            GridView.count(
+              crossAxisCount: 2,
+              crossAxisSpacing: 16.0,
+              mainAxisSpacing: 16.0,
+              shrinkWrap: true,
+      
+              children: ElevatedButtonBuilder3.buildButtons(
+                documentRequests: request,
+                onPressed: (DocumentRequest request) {
 
-            children: ElevatedButtonBuilder3.buildButtons(
-              documentRequests: request,
-              onPressed: (DocumentRequest request) {
-
-              },
+                },
+              ),
             ),
-          ),
-
-        ],
+      
+          ],
+        ),
       ),
     );;
   }
   static Widget _buildPage3(List<Organisation> FavouriteOrgs, BuildContext context) {
-    return Container(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [
-          const SizedBox(height: 20),
-          GridView.count(
-            crossAxisCount: 2,
-            crossAxisSpacing: 16.0,
-            mainAxisSpacing: 16.0,
-            shrinkWrap: true,
-
-            children: ElevatedButtonBuilder2.buildButtons(
-              organizations: FavouriteOrgs,
-              onPressed: (Organisation organization) {
-                /*Navigator.of(context).push(
-
-                  MaterialPageRoute(
-                    builder: (context) => const CreateScreen(),
-                  ),
-                );*/
-              },
+    return
+      SingleChildScrollView(
+        child: Container(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            const SizedBox(height: 20),
+            GridView.count(
+              crossAxisCount: 2,
+              crossAxisSpacing: 16.0,
+              mainAxisSpacing: 16.0,
+              shrinkWrap: true,
+        
+              children: ElevatedButtonBuilder2.buildButtons(
+                organizations: FavouriteOrgs,
+                onPressed: (Organisation organization) {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (context) => FormOrgScreen(selectedOrganisation: organization),
+                    ),
+                  );
+                },
+              ),
+              ),
+        
+          ],
+        ),
             ),
-            ),
-
-        ],
-      ),
-    );
+      );
   }
 
 /*

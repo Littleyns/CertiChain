@@ -3,6 +3,7 @@ import 'package:chatflutter/screens/create_screen.dart';
 import 'package:chatflutter/screens/home_screen.dart';
 import 'package:chatflutter/screens/search_screen.dart';
 import 'package:chatflutter/services/organisations_manager_service.dart';
+import 'package:chatflutter/services/user_session.dart';
 import 'package:chatflutter/services/web3_connection.dart';
 import 'package:chatflutter/widgets/custom_searchbar.dart';
 import 'package:flutter/material.dart';
@@ -74,11 +75,11 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget _buildBody() {
     switch (_currentScreenIndex) {
       case 0:
-        return HomeScreen(authenticatedUser: currentUser);
+        return HomeScreen();
       case 1:
         return SearchScreen();
        case 2:
-        return CreateScreen(authenticatedUser: currentUser,organisation: allOrgs[0]);
+        return CreateScreen(organisation: allOrgs[0]);
       case 3:
         return BlockchainScreen();
       default:
@@ -88,7 +89,14 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   void initState(){
     super.initState();
-    currentUser = new AuthenticatedUser(publicKey: '0x0df08E74FFd70cd5D4C28D5bA6261755040E69d1', privateKey: '0x3537081c99dff4618e1f3de8382912a1d7ccf651ade0e015b45b79cf25808384', type: UserType.Particular);
+    // Simulation d'une authentification
+    UserSession.loginUser(new AuthenticatedUser(publicKey: '0x0df08E74FFd70cd5D4C28D5bA6261755040E69d1', privateKey: '0x3537081c99dff4618e1f3de8382912a1d7ccf651ade0e015b45b79cf25808384', type: UserType.Particular));
+    try {
+      currentUser = UserSession.currentUser;
+      // Utilisez currentUser ici
+    } catch (e) {
+      // Gérez l'erreur si aucun utilisateur n'est connecté
+    }
     allOrgs.add(new Organisation(orgAddress: '12345',domain: Domain.Education,name: "placeholder org(noOrgsFound)"));
     _initializationAsync();
   }

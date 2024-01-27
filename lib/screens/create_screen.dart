@@ -5,13 +5,13 @@ import 'package:web3dart/credentials.dart';
 import '../models/AuthenticatedUser.dart';
 import '../models/Organisation.dart';
 import '../services/particulars_manager_service.dart';
+import '../services/user_session.dart';
 import '../services/web3_connection.dart';
 
 
 class CreateScreen extends StatefulWidget {
-  final AuthenticatedUser authenticatedUser;
   final Organisation organisation;
-  const CreateScreen({Key? key, required this.authenticatedUser, required this.organisation}) : super(key: key);
+  const CreateScreen({Key? key, required this.organisation}) : super(key: key);
 
   @override
   State<CreateScreen> createState() => _CreateScreenState();
@@ -20,6 +20,7 @@ class CreateScreen extends StatefulWidget {
 class _CreateScreenState extends State<CreateScreen> {
   final TextEditingController _searchController = TextEditingController();
   late ParticularsManagerService particularsService;
+  late AuthenticatedUser authenticatedUser;
   bool isFavorite = false;
   int hoveredIndex = -1;
   final List<String> myList = [
@@ -44,14 +45,19 @@ class _CreateScreenState extends State<CreateScreen> {
   @override
   void initState() {
     super.initState();
+    try {
+      authenticatedUser = UserSession.currentUser;
+      // Utilisez currentUser ici
+    } catch (e) {
+      // Gérez l'erreur si aucun utilisateur n'est connecté
+    }
     _initializationAsync();
   }
   Future<void> _initializationAsync() async {
-    String addressPriveeServer = dotenv.get('PKEY_SERVER');
-    Web3Connection web3Conn = new Web3Connection("http://${dotenv.get('GANACHE_HOST')}:${dotenv.get('GANACHE_PORT')}", "ws://${dotenv.get('GANACHE_HOST')}:${dotenv.get('GANACHE_PORT')}", addressPriveeServer);
+    Web3Connection web3Conn = new Web3Connection("http://${dotenv.get('GANACHE_HOST')}:${dotenv.get('GANACHE_PORT')}", "ws://${dotenv.get('GANACHE_HOST')}:${dotenv.get('GANACHE_PORT')}", dotenv.get('PKEY_SERVER'));
     particularsService = new ParticularsManagerService(web3Conn);
     await particularsService.initializeContract(); // Maybe show requests also
-    bool orgIsFavourite = await particularsService.orgIsFavourite(EthPrivateKey.fromHex(widget.authenticatedUser.privateKey), widget.organisation.orgAddress);
+    bool orgIsFavourite = await particularsService.orgIsFavourite(EthPrivateKey.fromHex(authenticatedUser.privateKey), widget.organisation.orgAddress);
     setState(() {
       isFavorite = orgIsFavourite;
     });
@@ -80,9 +86,9 @@ class _CreateScreenState extends State<CreateScreen> {
                   ),
                   onPressed: () {
                     if(isFavorite){
-                      particularsService.removeFavouriteOrg(EthPrivateKey.fromHex(widget.authenticatedUser.privateKey), widget.organisation.orgAddress);
+                      particularsService.removeFavouriteOrg(EthPrivateKey.fromHex(authenticatedUser.privateKey), widget.organisation.orgAddress);
                     }else{
-                      particularsService.addFavouriteOrg(EthPrivateKey.fromHex(widget.authenticatedUser.privateKey), widget.organisation.orgAddress);
+                      particularsService.addFavouriteOrg(EthPrivateKey.fromHex(authenticatedUser.privateKey), widget.organisation.orgAddress);
                     }
                     setState(() {
                       isFavorite = !isFavorite;

@@ -1,17 +1,22 @@
+import 'package:chatflutter/models/AuthenticatedUser.dart';
 import 'package:chatflutter/models/Particular.dart';
+import 'package:chatflutter/models/TemplateDocument.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:web3dart/credentials.dart';
 
 import '../models/Document.dart';
 import '../models/Organisation.dart';
 import '../services/organisations_manager_service.dart';
+import '../services/particulars_manager_service.dart';
+import '../services/user_session.dart';
 import '../services/web3_connection.dart';
 
 class FormOrgScreen extends StatefulWidget {
   final Organisation selectedOrganisation;
-  final Particular user;
 
   const FormOrgScreen(
-      {Key? key, required this.selectedOrganisation, required this.user}) : super(key: key);
+      {Key? key, required this.selectedOrganisation}) : super(key: key);
 
   @override
   State<FormOrgScreen> createState() => _FormOrgScreenState();
@@ -23,42 +28,37 @@ class _FormOrgScreenState extends State<FormOrgScreen> {
   int hoveredIndex = -1;
 
   bool isFavorite = false;
-  late List<Document> _documents = [];
-  late String _orgAddress;
-  late String _name;
-  late OrganisationsManagerService _orgService; // Ajout de la variable pour la connexion Web3
-
+  late List<TemplateDocument> _templateDocuments = [];
+  late AuthenticatedUser user;
+  late OrganisationsManagerService organisationService; // Ajout de la variable pour la connexion Web3
+  late ParticularsManagerService particularsService;
   @override
   void initState() {
     super.initState();
-    // Initialisation de la connexion Web3
-    Web3Connection web3Connection = Web3Connection('http://your_rpc_url', 'ws://your_ws_url', 'your_private_key');
-    web3Connection.init();
-    // Initialisation du service Web3
-    _orgService = OrganisationsManagerService(web3Connection);
-
-    _name = widget.selectedOrganisation.name;
-    _getOrgDocuments();
-
-    // Vérifier si l'organisation est en favori pour cet utilisateur
-    isFavorite = widget.user.isFavorite(widget.selectedOrganisation);
-  }
-
-  // Fonction pour récupérer les documents de l'organisation
-  Future<void> _getOrgDocuments() async {
-    _orgAddress = widget.selectedOrganisation.orgAddress;
     try {
-      List<Document> orgDocuments =
-          await _orgService.getOrgDocuments(_orgAddress);
-      setState(() {
-        _documents = orgDocuments;
-      });
+      user = UserSession.currentUser;
+      // Utilisez currentUser ici
     } catch (e) {
-      print(e);
+      // Gérez l'erreur si aucun utilisateur n'est connecté
     }
+    _initializationAsync();
   }
 
-  List<Document> filteredList = [];
+  Future<void> _initializationAsync() async {
+    Web3Connection web3Conn = new Web3Connection("http://${dotenv.get('GANACHE_HOST')}:${dotenv.get('GANACHE_PORT')}", "ws://${dotenv.get('GANACHE_HOST')}:${dotenv.get('GANACHE_PORT')}", dotenv.get('PKEY_SERVER'));
+    particularsService = new ParticularsManagerService(web3Conn);
+    organisationService = OrganisationsManagerService(web3Conn);
+    await particularsService.initializeContract(); // Maybe show requests also
+    await organisationService.initializeContract(); // Maybe show requests also
+    bool orgIsFavourite = await particularsService.orgIsFavourite(EthPrivateKey.fromHex(user.privateKey), widget.selectedOrganisation.orgAddress);
+    List<TemplateDocument> orgTemplateDocuments = await organisationService.getOrgTemplateDocuments(widget.selectedOrganisation.orgAddress);
+    setState(() {
+      isFavorite = orgIsFavourite;
+      _templateDocuments = orgTemplateDocuments;
+    });
+  }
+
+  List<TemplateDocument> filteredList = [];
 
   @override
   Widget build(BuildContext context) {
@@ -70,7 +70,7 @@ class _FormOrgScreenState extends State<FormOrgScreen> {
             Row(
               children: [
                 Text(
-                  _name,
+                  widget.selectedOrganisation.name,
                   style: const TextStyle(
                       fontSize: 20.0, fontWeight: FontWeight.bold),
                 ),
@@ -86,12 +86,13 @@ class _FormOrgScreenState extends State<FormOrgScreen> {
                   onPressed: () {
                     // Toggle the favorite state
                     setState(() {
-                      isFavorite = !isFavorite;
-                      if (isFavorite) {
-                        widget.user.favouriteOrgs.add(widget.selectedOrganisation);
-                      } else {
-                        widget.user.favouriteOrgs.remove(widget.selectedOrganisation);
+                      if(isFavorite){
+                        particularsService.removeFavouriteOrg(EthPrivateKey.fromHex(user.privateKey), widget.selectedOrganisation.orgAddress);
+                      }else{
+                        particularsService.addFavouriteOrg(EthPrivateKey.fromHex(user.privateKey), widget.selectedOrganisation.orgAddress);
                       }
+                      isFavorite = !isFavorite;
+
                     });
                   },
                 ),
@@ -105,7 +106,7 @@ class _FormOrgScreenState extends State<FormOrgScreen> {
         ),
         leading: const CircleAvatar(
           // Your photo or icon goes here
-          backgroundImage: AssetImage('assets/your_photo.png'),
+          backgroundImage: AssetImage('assets/images/educationIcon.png'),
         ),
       ),
 
@@ -126,9 +127,9 @@ class _FormOrgScreenState extends State<FormOrgScreen> {
                 onChanged: (value) {
                   if (value.length > 1) {
                     setState(() {
-                      filteredList = _documents.where((item) =>
-                              item.description.toLowerCase().contains(value.toLowerCase()) ||
-                              item.docId.toLowerCase().contains(value.toLowerCase()))
+                      filteredList = _templateDocuments.where((item) =>
+                              item.name.toLowerCase().contains(value.toLowerCase()) ||
+                              item.id.toLowerCase().contains(value.toLowerCase()))
                           .toList();
                     });
                   } else {
@@ -152,11 +153,11 @@ class _FormOrgScreenState extends State<FormOrgScreen> {
                     children: List.generate(
                       filteredList.length > 0
                           ? filteredList.length
-                          : _documents.length,
+                          : _templateDocuments.length,
                       (index) => InkWell(
                         onTap: () {
                           // Action lorsque l'élément est cliqué
-                          print('Item clicked: ${_documents[index]}');
+                          print('Item clicked: ${_templateDocuments[index]}');
                         },
                         onHover: (isHovered) {
                           // Mise à jour de l'état de survol
@@ -174,9 +175,9 @@ class _FormOrgScreenState extends State<FormOrgScreen> {
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
                                     children: [
-                                      Text(filteredList[index].description),
+                                      Text(filteredList[index].name),
                                       Text(
-                                        'ref: ${filteredList[index].docId}',
+                                        'ref: ${filteredList[index].id}',
                                         style: const TextStyle(fontSize: 12),
                                       ),
                                     ],
@@ -185,9 +186,9 @@ class _FormOrgScreenState extends State<FormOrgScreen> {
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
                                     children: [
-                                      Text(_documents[index].description),
+                                      Text(_templateDocuments[index].name),
                                       Text(
-                                        'ref: ${_documents[index].docId}',
+                                        'ref: ${_templateDocuments[index].id}',
                                         style: const TextStyle(fontSize: 12),
                                       ),
                                     ],
