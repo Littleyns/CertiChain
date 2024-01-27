@@ -74,7 +74,7 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget _buildBody() {
     switch (_currentScreenIndex) {
       case 0:
-        return HomeScreen();
+        return HomeScreen(authenticatedUser: currentUser);
       case 1:
         return SearchScreen();
        case 2:

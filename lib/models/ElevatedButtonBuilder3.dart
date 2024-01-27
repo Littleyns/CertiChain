@@ -1,49 +1,24 @@
-/*import 'package:flutter/material.dart';
-
-class ElevatedButtonBuilder {
-  static ElevatedButton build({
-    required String label,
-    required VoidCallback onPressed,
-    Color? buttonColor,
-    Color? textColor,
-  }) {
-  *//*
-    return ElevatedButton(
-      onPressed: onPressed,
-      style: ElevatedButton.styleFrom(
-        primary: buttonColor ?? Colors.black,
-        onPrimary: textColor ?? Colors.white,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12.0),
-        ),
-      ),
-      child: Text(
-        label,
-        textAlign: TextAlign.center,
-      ),
-    );
-  }
-}
-*/
-
-// elevated_button_builder.dart
-
 import 'package:flutter/material.dart';
 import '../models/Document.dart';
-class ElevatedButtonBuilder {
+import 'Consts.dart';
+import 'DocumentRequest.dart';
+
+
+
+class ElevatedButtonBuilder3 {
   static List<Widget> buildButtons({
-    required List<Document> documents,
-    required Function(Document) onPressed,
+    required List<DocumentRequest> documentRequests,
+    required Function(DocumentRequest) onPressed,
   }) {
     List<Widget> buttons = [];
 
-    for (int i = 0; i < documents.length; i++) {
-      String templateDocName = documents[i].templateDocName;
-      //String description = documents[i].description;
-      //String owner = documents[i].ParticularOwner;
+    for (int i = 0; i < documentRequests.length; i++) {
+      String issuerName = documentRequests[i].issuerName;
+      String templateDocName = documentRequests[i].templateDocName;
+      String status = _getStatusString(documentRequests[i].status);
 
       ElevatedButton button = ElevatedButton(
-        onPressed: () => onPressed(documents[i]),
+        onPressed: () => onPressed(documentRequests[i]),
         style: ElevatedButton.styleFrom(
           primary: i % 2 == 0 ? Colors.black : Colors.grey,
           shape: RoundedRectangleBorder(
@@ -54,15 +29,15 @@ class ElevatedButtonBuilder {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text(
-              templateDocName,
+              issuerName,
               textAlign: TextAlign.center,
               style: TextStyle(
                 color: Colors.white,
               ),
             ),
-            /*SizedBox(height: 8.0),
+            SizedBox(height: 8.0),
             Text(
-              description,
+              templateDocName,
               textAlign: TextAlign.center,
               style: TextStyle(
                 color: Colors.white,
@@ -71,13 +46,13 @@ class ElevatedButtonBuilder {
             ),
             SizedBox(height: 8.0),
             Text(
-              owner,
+              status,
               textAlign: TextAlign.center,
               style: TextStyle(
                 color: Colors.white,
                 fontSize: 12.0,
               ),
-            ),*/
+            ),
           ],
         ),
       );
@@ -86,5 +61,18 @@ class ElevatedButtonBuilder {
     }
 
     return buttons;
+  }
+
+  static String _getStatusString(DocumentTransactionStatus status) {
+    switch (status) {
+      case DocumentTransactionStatus.Pending:
+        return 'Pending';
+      case DocumentTransactionStatus.Approved:
+        return 'Approved';
+      case DocumentTransactionStatus.Rejected:
+        return 'Rejected';
+      default:
+        return 'Unknown';
+    }
   }
 }
