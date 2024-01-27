@@ -49,7 +49,7 @@ class _FormOrgScreenState extends State<FormOrgScreen> {
     _orgAddress = widget.selectedOrganisation.orgAddress;
     try {
       List<Document> orgDocuments =
-      await _orgService.getOrgDocuments(_orgAddress);
+          await _orgService.getOrgDocuments(_orgAddress);
       setState(() {
         _documents = orgDocuments;
       });
@@ -105,7 +105,7 @@ class _FormOrgScreenState extends State<FormOrgScreen> {
         ),
         leading: const CircleAvatar(
           // Your photo or icon goes here
-          backgroundImage: AssetImage('assets/images/educationIcon.png'),
+          backgroundImage: AssetImage('assets/your_photo.png'),
         ),
       ),
 
@@ -127,8 +127,8 @@ class _FormOrgScreenState extends State<FormOrgScreen> {
                   if (value.length > 1) {
                     setState(() {
                       filteredList = _documents.where((item) =>
-                      item.description.toLowerCase().contains(value.toLowerCase()) ||
-                          item.docId.toLowerCase().contains(value.toLowerCase()))
+                              item.description.toLowerCase().contains(value.toLowerCase()) ||
+                              item.docId.toLowerCase().contains(value.toLowerCase()))
                           .toList();
                     });
                   } else {
@@ -153,7 +153,7 @@ class _FormOrgScreenState extends State<FormOrgScreen> {
                       filteredList.length > 0
                           ? filteredList.length
                           : _documents.length,
-                          (index) => InkWell(
+                      (index) => InkWell(
                         onTap: () {
                           // Action lorsque l'élément est cliqué
                           print('Item clicked: ${_documents[index]}');
@@ -171,27 +171,27 @@ class _FormOrgScreenState extends State<FormOrgScreen> {
                             //title: filteredList.length>0? Text(filteredList[index]): Text(myList[index]),
                             title: filteredList.length > 0
                                 ? Column(
-                              crossAxisAlignment:
-                              CrossAxisAlignment.start,
-                              children: [
-                                Text(filteredList[index].description),
-                                Text(
-                                  'ref: ${filteredList[index].docId}',
-                                  style: const TextStyle(fontSize: 12),
-                                ),
-                              ],
-                            )
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(filteredList[index].description),
+                                      Text(
+                                        'ref: ${filteredList[index].docId}',
+                                        style: const TextStyle(fontSize: 12),
+                                      ),
+                                    ],
+                                  )
                                 : Column(
-                              crossAxisAlignment:
-                              CrossAxisAlignment.start,
-                              children: [
-                                Text(_documents[index].description),
-                                Text(
-                                  'ref: ${_documents[index].docId}',
-                                  style: const TextStyle(fontSize: 12),
-                                ),
-                              ],
-                            ),
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(_documents[index].description),
+                                      Text(
+                                        'ref: ${_documents[index].docId}',
+                                        style: const TextStyle(fontSize: 12),
+                                      ),
+                                    ],
+                                  ),
                           ),
                         ),
                       ),
