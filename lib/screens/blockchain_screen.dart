@@ -28,7 +28,6 @@ class _BlockchainScreenState extends State<BlockchainScreen> {
     super.initState();
     _initializationAsync();
 
-
   }
   Future<void> _initializationAsync() async {
     String addressPriveeServer = dotenv.env['PKEY_SERVER'] ?? "";

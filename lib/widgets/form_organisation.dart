@@ -105,7 +105,7 @@ class _FormOrgScreenState extends State<FormOrgScreen> {
         ),
         leading: const CircleAvatar(
           // Your photo or icon goes here
-          backgroundImage: AssetImage('assets/your_photo.png'),
+          backgroundImage: AssetImage('assets/images/educationIcon.png'),
         ),
       ),
 
