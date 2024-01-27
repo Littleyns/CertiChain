@@ -98,6 +98,10 @@ class _MyHomePageState extends State<MyHomePage> {
     OrganisationsManagerService organisationsService = new OrganisationsManagerService(web3Conn);
     await organisationsService.initializeContract();
     allOrgs = await organisationsService.getAllOrganisations(EthPrivateKey.fromHex(currentUser.privateKey));
+    // Handle the case of no orgs found or not filled blockchain
+    if(allOrgs.length == 0){
+      allOrgs.add(new Organisation(orgAddress: '12345',domain: Domain.Education,name: "placeholder org(noOrgsFound)"));
+    }
   }
   @override
   Widget build(BuildContext context) {
