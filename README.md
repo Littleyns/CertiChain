@@ -1,11 +1,9 @@
-1: Télécharger Ganache https://trufflesuite.com/ganache/
-2. Télécharger Truffle https://trufflesuite.com/docs/truffle/how-to/install/
-2: executer la commande "flutter pub get" pour récupérer les packages nécéssaires à la communication avec
-la blockchain notemment web3_dart et http
-3: remplacer la variable d'environnement PKEY_SERVER par une clé privée aléatoire que vous trouverez sur ganache en cliquant sur l'icone "Show keys" de l'une des adresses publiques
+# Certichain : blockchain Shcool project for Flutter development
 
-## Pour remplir la blockchain avec de la data
-1: Changer les adresses publiques et privées dans le fichier ./Services/main_fill_mockdata.dart 
-par celles présentes sur Ganache
+## To run
 
-2: éxécuter le fichier
+1. run "flutter pub get"
+2. run "npm install" to install node dependencies for backend (ganache-cli + truffle)
+3. run "npm run start-dev" to run the blockchain simulation and deploy the smartcontracts to it
+4. flutter run ./services/fill_web3_mockData.dart
+5. flutter run

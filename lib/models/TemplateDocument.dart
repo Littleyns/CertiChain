@@ -1,4 +1,4 @@
-class TemplateDocument {
+class TemplateDocument { // Modifier par un DTO dans solidity qui contient directement les champs qui nous interesse en UI
   String id;
   String name;
 

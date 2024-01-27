@@ -1,13 +1,17 @@
 import 'package:chatflutter/screens/blockchain_screen.dart';
 import 'package:chatflutter/screens/create_screen.dart';
 import 'package:chatflutter/screens/home_screen.dart';
-import 'package:chatflutter/screens/profile_screen.dart';
 import 'package:chatflutter/screens/search_screen.dart';
+import 'package:chatflutter/services/organisations_manager_service.dart';
+import 'package:chatflutter/services/user_session.dart';
 import 'package:chatflutter/services/web3_connection.dart';
-import 'package:chatflutter/services/web3_service.dart';
 import 'package:chatflutter/widgets/custom_searchbar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:web3dart/credentials.dart';
+
+import 'models/AuthenticatedUser.dart';
+import 'models/Organisation.dart';
 
 Future<void> main() async {
   await dotenv.load(fileName: ".env");
@@ -66,31 +70,48 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   int _currentScreenIndex = 0;
+  late AuthenticatedUser currentUser;
+  late List<Organisation> allOrgs = []; //FIXME! to remove later after implementing search organisation screen
   Widget _buildBody() {
     switch (_currentScreenIndex) {
       case 0:
         return HomeScreen();
       case 1:
         return SearchScreen();
-      case 2:
-        return CreateScreen();
+       case 2:
+        return CreateScreen(organisation: allOrgs[0]);
       case 3:
         return BlockchainScreen();
-      case 4:
-        return ProfileScreen();
       default:
         return Container();
     }
   }
   @override
-  void initState() {
+  void initState(){
     super.initState();
-    Web3Connection web3Conn = new Web3Connection("HTTP://127.0.0.1:7545", "HTTP://10.0.2.2:7545", "0x85289cd8817f6df013284fb557cfdb5b9feada4f9556be58594c2c9ac2afe970");
-
-    Web3Service web3Service = new Web3Service(web3Conn);
-
+    // Simulation d'une authentification
+    UserSession.loginUser(new AuthenticatedUser(publicKey: '0x0df08E74FFd70cd5D4C28D5bA6261755040E69d1', privateKey: '0x3537081c99dff4618e1f3de8382912a1d7ccf651ade0e015b45b79cf25808384', type: UserType.Particular));
+    try {
+      currentUser = UserSession.currentUser;
+      // Utilisez currentUser ici
+    } catch (e) {
+      // Gérez l'erreur si aucun utilisateur n'est connecté
+    }
+    allOrgs.add(new Organisation(orgAddress: '12345',domain: Domain.Education,name: "placeholder org(noOrgsFound)"));
+    _initializationAsync();
   }
+  Future<void> _initializationAsync() async {
+    // FIXME! to remove later after implementing search organisation screen
+    Web3Connection web3Conn = new Web3Connection("http://${dotenv.env['GANACHE_HOST']}:${dotenv.env['GANACHE_PORT']}", "ws://${dotenv.env['GANACHE_HOST']}:${dotenv.env['GANACHE_PORT']}", dotenv.env['PKEY_SERVER']??"");
 
+    OrganisationsManagerService organisationsService = new OrganisationsManagerService(web3Conn);
+    await organisationsService.initializeContract();
+    allOrgs = await organisationsService.getAllOrganisations(EthPrivateKey.fromHex(currentUser.privateKey));
+    // Handle the case of no orgs found or not filled blockchain
+    if(allOrgs.length == 0){
+      allOrgs.add(new Organisation(orgAddress: '12345',domain: Domain.Education,name: "placeholder org(noOrgsFound)"));
+    }
+  }
   @override
   Widget build(BuildContext context) {
     // This method is rerun every time setState is called, for instance as done
@@ -132,7 +153,7 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
           BottomNavigationBarItem(
             icon: Image.asset(
-              '../assets/blockchain_icon.png',
+              'assets/images/blockchain_icon.png',
               width: 25.0, // Ajustez la largeur selon vos besoins
               height: 25.0, // Ajustez la hauteur selon vos besoins
             ),

@@ -1,7 +1,5 @@
-// web3_service.dart
+// web3_service.txt
 import 'dart:convert';
-import 'dart:html';
-
 import 'package:flutter/services.dart';
 import 'package:http/src/client.dart';
 import 'package:web3dart/web3dart.dart';
