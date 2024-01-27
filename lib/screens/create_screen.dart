@@ -1,12 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:web3dart/credentials.dart';
-
-import '../models/AuthenticatedUser.dart';
-
 
 class CreateScreen extends StatefulWidget {
-  final AuthenticatedUser authenticatedUser;
-  const CreateScreen({Key? key, required this.authenticatedUser}) : super(key: key);
+  const CreateScreen({Key? key}) : super(key: key);
 
   @override
   State<CreateScreen> createState() => _CreateScreenState();
@@ -72,7 +67,7 @@ class _CreateScreenState extends State<CreateScreen> {
         ),
         leading: const CircleAvatar(
           // Your photo or icon goes here
-          backgroundImage: AssetImage('assets/images/educationIcon.png'),
+          backgroundImage: AssetImage('assets/your_photo.png'),
         ),
       ),
 
@@ -138,7 +133,7 @@ class _CreateScreenState extends State<CreateScreen> {
                         child: Container(
                           margin: const EdgeInsets.only(bottom: 8.0),
                           color: hoveredIndex == index
-                              ? Colors.black12 // Couleur de fond marron lorsque survolé
+                              ? Colors.brown // Couleur de fond marron lorsque survolé
                               : null,
                           child: ListTile(
                             title: filteredList.length>0? Text(filteredList[index]): Text(myList[index]),
