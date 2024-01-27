@@ -41,7 +41,7 @@ module.exports = async function (deployer, network, accounts) {
   var adressePubliqueOrganisation = "0xA16842b28FF96Ec695008996F0D85BE705A2c4Dd";
   var adressePriveeOrganisation = "0xf0906fd865d515fed0f4563175bfc5da0eb44cce630fac63a8ede30816d2e6ed";
   var organisationAccount = web3.eth.accounts.privateKeyToAccount(adressePriveeOrganisation).address;
-  await orgManager.addOrganisation(adressePubliqueOrganisation,0,"3il",{ from: serverAccount });
+  await orgManager.addOrganisation(adressePubliqueOrganisation,1,"3il",{ from: serverAccount });
 
 
   // Création organisation 2

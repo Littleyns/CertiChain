@@ -42,7 +42,7 @@ class ElevatedButtonBuilder3 {
               textAlign: TextAlign.center,
               style: TextStyle(
                 color: Colors.white,
-                fontSize: 12.0,
+                fontSize: 15.0,
               ),
             ),
             SizedBox(height: 8.0),
@@ -51,7 +51,7 @@ class ElevatedButtonBuilder3 {
               textAlign: TextAlign.center,
               style: TextStyle(
                 color: Colors.white,
-                fontSize: 12.0,
+                fontSize: 15.0,
               ),
             ),
           ],
