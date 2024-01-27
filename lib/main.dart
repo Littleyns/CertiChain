@@ -70,7 +70,7 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   int _currentScreenIndex = 0;
   late AuthenticatedUser currentUser;
-  late List<Organisation> allOrgs; //FIXME! to remove later after implementing search organisation screen
+  late List<Organisation> allOrgs = []; //FIXME! to remove later after implementing search organisation screen
   Widget _buildBody() {
     switch (_currentScreenIndex) {
       case 0:
@@ -89,6 +89,7 @@ class _MyHomePageState extends State<MyHomePage> {
   void initState(){
     super.initState();
     currentUser = new AuthenticatedUser(publicKey: '0x0df08E74FFd70cd5D4C28D5bA6261755040E69d1', privateKey: '0x3537081c99dff4618e1f3de8382912a1d7ccf651ade0e015b45b79cf25808384', type: UserType.Particular);
+    allOrgs.add(new Organisation(orgAddress: '12345',domain: Domain.Education,name: "placeholder org(noOrgsFound)"));
     _initializationAsync();
   }
   Future<void> _initializationAsync() async {
