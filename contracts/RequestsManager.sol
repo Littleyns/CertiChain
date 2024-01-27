@@ -86,14 +86,14 @@ contract RequestsManager {
     ) external onlyOrg { // Demande à un particulier l'attribution d'un document
         // vérifier que la templateDoc existe et qu'il appartient à l'organisation
         // Créez une demande d'attribution
-        DocumentsManager.Document memory grantedPendingDoc = docContract.createPendingDocument(_templateDocId, description,_particularAddress, msg.sender,expirationDate );
+        DocumentsManager.Document memory grantedDoc = docContract.createDocument(_templateDocId, description,_particularAddress, msg.sender,expirationDate );
 
 
         GrantRequest memory newRequest = GrantRequest({
         grantRequestId: nextGrantRequestId,
         recipient: _particularAddress,
         issuer: msg.sender,
-        docId: grantedPendingDoc.docId,
+        docId: grantedDoc.docId,
         status: DocumentTransactionStatus.Pending
         });
         
@@ -174,9 +174,9 @@ contract RequestsManager {
         GrantRequest memory grantRequest = grantRequests[_grantRequestId];
 
         // Persistence
-        grantRequest.status = DocumentTransactionStatus.Approved;
+        grantRequests[_grantRequestId].status = DocumentTransactionStatus.Approved;
 
-        docContract.transferFromPendingToDelivered(grantRequest.docId);
+        //docContract.transferFromPendingToDelivered(grantRequest.docId);
         particularsContract.addDocToParticular(grantRequest.docId,msg.sender);
 
         // si le template id correspond changer le status de la requete ou l'effacer

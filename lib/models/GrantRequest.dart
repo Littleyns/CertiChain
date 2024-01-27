@@ -21,8 +21,8 @@ class GrantRequest { // C'est l'attribution d'un document à un particulier par 
 
   GrantRequest.fromJson(List<dynamic> json)
       : grantRequestId = json[0].toString() as String,
-        issuerName = json[1].toString() as String,
-        recipientName = json[2].toString() as String,
+        issuerName = json[2].toString() as String,
+        recipientName = json[1].toString() as String,
         doc = Document.fromJson(json[3]),
         status = statusFromIdentifier(json[4].toString().toString());
 }

@@ -123,6 +123,7 @@ contract DocumentsManager {
     function getDocumentDTO(uint256 i) external view returns (DocumentDTO memory) {
         return DocumentDTO({docId:documents[i].docId, templateDocName:templateDocuments[documents[i].templateDocId].name, description: documents[i].description, organisationName:orgContract.getOrganisation(documents[i].organisationAddress).name, particularName:particularsContract.getParticular(documents[i].particularAddress).username,expirationDate: documents[i].expirationDate});
     }
+
     function getDocumentsByTemplateName(string memory _templateDocName) external view returns (DocumentDTO[] memory) {
         DocumentDTO[] memory res = new DocumentDTO[](nextDocumentId);
         bytes memory templateDocNameBytes = bytes(_templateDocName);

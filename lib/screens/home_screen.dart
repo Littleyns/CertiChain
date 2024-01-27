@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:chatflutter/models/ElevatedButtonBuilder.dart';
+import 'package:chatflutter/widgets/ElevatedButtonBuilder.dart';
 import 'package:chatflutter/services/web3_connection.dart';
 import 'package:flutter/widgets.dart' show WidgetsFlutterBinding;
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -7,9 +7,9 @@ import 'package:web3dart/credentials.dart';
 
 import '../models/AuthenticatedUser.dart';
 import '../models/DocumentRequest.dart';
-import '../models/ElevatedButtonBuilder2.dart';
-import '../models/ElevatedButtonBuilder3.dart';
-import '../models/ElevatedButtonBuilder4.dart';
+import '../widgets/ElevatedButtonBuilder2.dart';
+import '../widgets/ElevatedButtonBuilder3.dart';
+import '../widgets/ElevatedButtonBuilder4.dart';
 import '../models/GrantRequest.dart';
 import '../models/Organisation.dart';
 import '../models/TemplateDocument.dart';
@@ -40,7 +40,6 @@ class _HomeScreenState extends State<HomeScreen> {
   List<GrantRequest> docRequests =[];
 
 
-  late List<Document> baseDocs;
   late List<Document> displayedDocuments = [];
   late List<Organisation> orgDocuments = [];
   late List<DocumentRequest> request =[];
@@ -79,11 +78,9 @@ class _HomeScreenState extends State<HomeScreen> {
     List<DocumentRequest> docRequestsSended = await particularsService.getParticularDocRequestsSended(EthPrivateKey.fromHex(authenticatedUser.privateKey));
     List<GrantRequest> docRequests = await particularsService.getParticularDocGrantRequestsReceived(EthPrivateKey.fromHex(authenticatedUser.privateKey));
 
-    // Ajouter une limite
-    baseDocs = await particularsService.getAllParticularsDocuments();
+
     print("je passe ici");
     setState(() {
-      displayedDocuments = baseDocs;
       displayedDocuments = documentsParticulier;
       orgDocuments = FavouriteOrgs;
 

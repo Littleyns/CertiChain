@@ -1,7 +1,4 @@
 import 'Consts.dart';
-import 'Organisation.dart';
-import 'Particular.dart';
-import 'TemplateDocument.dart';
 
 class DocumentRequest { // C'est la demande de document par un particulier à un organisme (Particulier ---DocumentRequest--> Organisme)
   String docRequestId; // Modifier par un DTO dans solidity qui contient directement les champs qui nous interesse en UI
@@ -20,8 +17,8 @@ class DocumentRequest { // C'est la demande de document par un particulier à un
 
   DocumentRequest.fromJson(List<dynamic> json)
       : docRequestId = json[0].toString() as String,
-        issuerName = json[1].toString() as String,
-        recipientName = json[2].toString() as String,
+        issuerName = json[2].toString() as String,
+        recipientName = json[1].toString() as String,
         templateDocName = json[3].toString() as String ,
         status = statusFromIdentifier(json[4].toString());
 

@@ -2,11 +2,9 @@
 import 'package:chatflutter/models/Document.dart';
 import 'package:chatflutter/models/DocumentRequest.dart';
 import 'package:chatflutter/models/GrantRequest.dart';
-import 'package:chatflutter/models/TemplateDocument.dart';
 import 'package:chatflutter/services/web3_connection.dart';
 import 'package:web3dart/web3dart.dart';
 
-import '../models/Consts.dart';
 import '../models/Organisation.dart';
 
 class ParticularsManagerService {

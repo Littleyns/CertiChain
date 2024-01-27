@@ -3,7 +3,6 @@ import 'package:chatflutter/services/organisations_manager_service.dart';
 import 'package:chatflutter/services/particulars_manager_service.dart';
 import 'package:chatflutter/services/requests_manager_service.dart';
 import 'package:chatflutter/services/web3_connection.dart';
-import 'package:flutter/widgets.dart' show WidgetsFlutterBinding;
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:web3dart/credentials.dart';
 
@@ -15,7 +14,7 @@ import '../models/Document.dart';
 import 'documents_manager_service.dart';
 void main() async {
   // Right before you would be doing any loading
-  WidgetsFlutterBinding.ensureInitialized();
+
   await dotenv.load(fileName: ".env");
   String addressPriveeServer = "0x69b39aa2fb86c7172d77d4b87b459ed7643c1e4b052536561e08d7d25592b373";
   Web3Connection web3Conn = new Web3Connection("http://${dotenv.get('GANACHE_HOST')}:${dotenv.get('GANACHE_PORT')}", "ws://${dotenv.get('GANACHE_HOST')}:${dotenv.get('GANACHE_PORT')}", addressPriveeServer);
@@ -75,8 +74,8 @@ void main() async {
   // Récupération des documents de l'organisme 2
   List<TemplateDocument> templateDocuments2 = await organisationsService.getOrgTemplateDocuments(adressePubliqueOrganisation2);
   print(templateDocuments2);
-  TemplateDocument visaCourt = templateDocuments[1];
-  TemplateDocument visaLong = templateDocuments[0];
+  TemplateDocument visaCourt = templateDocuments2[1];
+  TemplateDocument visaLong = templateDocuments2[0];
 
   //Demande d'un document par toto à un organisme
   await requestsService.requestDocument(EthPrivateKey.fromHex(adressePriveeParticulier),adressePubliqueOrganisation,diplomeInge.id);

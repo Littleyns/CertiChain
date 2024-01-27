@@ -1,19 +1,22 @@
+
 import 'package:flutter/material.dart';
-import 'GrantRequest.dart';
+import '../models/Document.dart';
+import '../models/Organisation.dart';
 
 
-class ElevatedButtonBuilder4 {
+class ElevatedButtonBuilder2 {
   static List<Widget> buildButtons({
-    required List<GrantRequest> grantRequests,
-    required Function(GrantRequest) onPressed,
+    required List<Organisation> organizations,
+    required Function onPressed,
   }) {
     List<Widget> buttons = [];
 
-    for (int i = 0; i < grantRequests.length; i++) {
-      GrantRequest request = grantRequests[i];
+    for (int i = 0; i < organizations.length; i++) {
+      String name = organizations[i].name;
+      String domain = _getDomainString(organizations[i].domain);
 
       ElevatedButton button = ElevatedButton(
-        onPressed: () => onPressed(request),
+        onPressed: () => onPressed(organizations[i]),
         style: ElevatedButton.styleFrom(
           primary: i % 2 == 0 ? Colors.black : Colors.grey,
           shape: RoundedRectangleBorder(
@@ -24,7 +27,7 @@ class ElevatedButtonBuilder4 {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text(
-              "Issuer: ${request.issuerName}",
+              name,
               textAlign: TextAlign.center,
               style: TextStyle(
                 color: Colors.white,
@@ -32,16 +35,7 @@ class ElevatedButtonBuilder4 {
             ),
             SizedBox(height: 8.0),
             Text(
-              "Recipient: ${request.recipientName}",
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 12.0,
-              ),
-            ),
-            SizedBox(height: 8.0),
-            Text(
-              "Template Doc: ${request.doc.templateDocName}",
+              domain,
               textAlign: TextAlign.center,
               style: TextStyle(
                 color: Colors.white,
@@ -57,4 +51,18 @@ class ElevatedButtonBuilder4 {
 
     return buttons;
   }
+
+  static String _getDomainString(Domain domain) {
+    switch (domain) {
+      case Domain.Government:
+        return 'Government';
+      case Domain.Education:
+        return 'Education';
+      case Domain.Banking:
+        return 'Banking';
+      default:
+        return 'Unknown';
+    }
+  }
+
 }
