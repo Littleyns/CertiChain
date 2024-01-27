@@ -1,25 +1,19 @@
 import 'package:flutter/material.dart';
-import '../models/Document.dart';
-import 'Consts.dart';
-import 'DocumentRequest.dart';
 import 'GrantRequest.dart';
 
 
-
-class ElevatedButtonBuilder3 {
+class ElevatedButtonBuilder4 {
   static List<Widget> buildButtons({
-    required List<DocumentRequest> documentRequests,
-    required Function(DocumentRequest) onPressed,
+    required List<GrantRequest> grantRequests,
+    required Function(GrantRequest) onPressed,
   }) {
     List<Widget> buttons = [];
 
-    for (int i = 0; i < documentRequests.length; i++) {
-      String issuerName = documentRequests[i].issuerName;
-      String templateDocName = documentRequests[i].templateDocName;
-      String status = _getStatusString(documentRequests[i].status);
+    for (int i = 0; i < grantRequests.length; i++) {
+      GrantRequest request = grantRequests[i];
 
       ElevatedButton button = ElevatedButton(
-        onPressed: () => onPressed(documentRequests[i]),
+        onPressed: () => onPressed(request),
         style: ElevatedButton.styleFrom(
           primary: i % 2 == 0 ? Colors.black : Colors.grey,
           shape: RoundedRectangleBorder(
@@ -30,7 +24,7 @@ class ElevatedButtonBuilder3 {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text(
-              issuerName,
+              "Issuer: ${request.issuerName}",
               textAlign: TextAlign.center,
               style: TextStyle(
                 color: Colors.white,
@@ -38,7 +32,7 @@ class ElevatedButtonBuilder3 {
             ),
             SizedBox(height: 8.0),
             Text(
-              templateDocName,
+              "Recipient: ${request.recipientName}",
               textAlign: TextAlign.center,
               style: TextStyle(
                 color: Colors.white,
@@ -47,7 +41,7 @@ class ElevatedButtonBuilder3 {
             ),
             SizedBox(height: 8.0),
             Text(
-              status,
+              "Template Doc: ${request.doc.templateDocName}",
               textAlign: TextAlign.center,
               style: TextStyle(
                 color: Colors.white,
@@ -62,18 +56,5 @@ class ElevatedButtonBuilder3 {
     }
 
     return buttons;
-  }
-
-  static String _getStatusString(DocumentTransactionStatus status) {
-    switch (status) {
-      case DocumentTransactionStatus.Pending:
-        return 'Pending';
-      case DocumentTransactionStatus.Approved:
-        return 'Approved';
-      case DocumentTransactionStatus.Rejected:
-        return 'Rejected';
-      default:
-        return 'Unknown';
-    }
   }
 }
