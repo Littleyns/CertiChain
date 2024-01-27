@@ -37,6 +37,12 @@ void main() async {
   String orgName = await organisationsService.getOrganisationName(adressePubliqueOrganisation);
   print(orgName+" Created");
 
+  // Création organisation 2
+  String adressePubliqueOrganisation2 = "0x92D957b5F34317070E2dAbbA66A77503f5995221";
+  String adressePriveeOrganisation2 = "0x1cb8a2d2a75747f0be56180619ba1aaf0ab74c72e7c1892758d210cbf36742e2";
+  await organisationsService.createOrganisation(web3Conn.creds, adressePubliqueOrganisation2,Domain.Government, "Consulat X");
+  String orgName2 = await organisationsService.getOrganisationName(adressePubliqueOrganisation2);
+  print(orgName2+" Created");
 
   // création d'un particulier
   String adressePubliqueParticulier = "0x0df08E74FFd70cd5D4C28D5bA6261755040E69d1";
@@ -54,6 +60,10 @@ void main() async {
   await documentsService.createTemplateDocument(EthPrivateKey.fromHex(adressePriveeOrganisation),adressePubliqueOrganisation,"Master spécialisé en big data");
   await documentsService.createTemplateDocument(EthPrivateKey.fromHex(adressePriveeOrganisation),adressePubliqueOrganisation,"Master spécialisé cybsecurité");
 
+  // Organisation 2 creation template dcuments
+  await documentsService.createTemplateDocument(EthPrivateKey.fromHex(adressePriveeOrganisation2),adressePubliqueOrganisation2,"Visa long séjour");
+  await documentsService.createTemplateDocument(EthPrivateKey.fromHex(adressePriveeOrganisation2),adressePubliqueOrganisation2,"Visa court séjour");
+
 
   // Récupération des documents de l'organisation
   List<TemplateDocument> templateDocuments = await organisationsService.getOrgTemplateDocuments(adressePubliqueOrganisation);
@@ -61,6 +71,13 @@ void main() async {
   TemplateDocument diplomeInge = templateDocuments[0];
   TemplateDocument masterSpecialise= templateDocuments[1];
   TemplateDocument masterCyber= templateDocuments[2];
+
+  // Récupération des documents de l'organisme 2
+  List<TemplateDocument> templateDocuments2 = await organisationsService.getOrgTemplateDocuments(adressePubliqueOrganisation2);
+  print(templateDocuments2);
+  TemplateDocument visaCourt = templateDocuments[1];
+  TemplateDocument visaLong = templateDocuments[0];
+
   //Demande d'un document par toto à un organisme
   await requestsService.requestDocument(EthPrivateKey.fromHex(adressePriveeParticulier),adressePubliqueOrganisation,diplomeInge.id);
   print("Document requested from toto to 3iL");
@@ -87,14 +104,30 @@ void main() async {
   }
 
   // 3il offre un master specialisé en cyber securité à toto
-  requestsService.requestDocumentGrant(EthPrivateKey.fromHex(adressePriveeOrganisation),adressePubliqueParticulier,masterCyber.id,"bien merité certifié owasp",BigInt.from(-1));
+  await requestsService.requestDocumentGrant(EthPrivateKey.fromHex(adressePriveeOrganisation),adressePubliqueParticulier,masterCyber.id,"bien merité certifié owasp",BigInt.from(-1));
+  print("3il granted master spécialisé to toto");
+
+  // Consulat X offre un visa de long séjour et un visa de court séjour à toto
+  await requestsService.requestDocumentGrant(EthPrivateKey.fromHex(adressePriveeOrganisation2),adressePubliqueParticulier,visaLong.id,"Autorisé à travailler à titre accessoire",BigInt.from(DateTime(2025, 1, 1).millisecondsSinceEpoch));
+  print("consulat X granted visa long sejour to toto");
+  await requestsService.requestDocumentGrant(EthPrivateKey.fromHex(adressePriveeOrganisation2),adressePubliqueParticulier,visaCourt.id,"Touristique uniquement",BigInt.from(DateTime(2021, 1, 1).millisecondsSinceEpoch));
+  print("consulat X granted visa court sejour to toto");
+
+  // Récuperer les requetes grant émises par les organisme pour toto
+  List<GrantRequest> grantRequests = await particularsService.getParticularDocGrantRequestsReceived(EthPrivateKey.fromHex(adressePriveeParticulier));
+
+  // Acceptation du visa court séjour et du master par toto
+  await requestsService.acceptGrantedDocument(EthPrivateKey.fromHex(adressePriveeParticulier), grantRequests[0].grantRequestId);
+  await requestsService.acceptGrantedDocument(EthPrivateKey.fromHex(adressePriveeParticulier), grantRequests[1].grantRequestId);
 
   //Récupération des documents de l'utilisateur
-  List<Document> documentsParticulier =await particularsService.getParticularDocuments(adressePubliqueParticulier);
+  List<Document> documentsParticulier = await particularsService.getParticularDocuments(adressePubliqueParticulier);
   print(documentsParticulier);
 
   // toto add 3il to favourite orgs
   await particularsService.addFavouriteOrg(EthPrivateKey.fromHex(adressePriveeParticulier), adressePubliqueOrganisation);
+  await particularsService.addFavouriteOrg(EthPrivateKey.fromHex(adressePriveeParticulier), adressePubliqueOrganisation2);
+  // toto add ConsulatX to favourite orgs
   List<Organisation> totoFavouriteOrgs = await particularsService.getFavouriteOrgs(EthPrivateKey.fromHex(adressePriveeParticulier));
   print("Toto Favourite orgs:");
   print(totoFavouriteOrgs);
