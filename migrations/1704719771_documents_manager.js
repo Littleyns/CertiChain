@@ -59,10 +59,14 @@ module.exports = async function (deployer, network, accounts) {
   await docManager.createTemplateDocument(adressePubliqueOrganisation,"Diplome d'ingénieur",{ from: organisationAccount });
   await docManager.createTemplateDocument(adressePubliqueOrganisation,"Master spécialisé en big data",{ from: organisationAccount });
   await docManager.createTemplateDocument(adressePubliqueOrganisation,"Master spécialisé cybsecurité",{ from: organisationAccount });
+  await docManager.createTemplateDocument(adressePubliqueOrganisation,"Master spécialisé en IOT",{ from: organisationAccount });
+  await docManager.createTemplateDocument(adressePubliqueOrganisation,"Master spécialisé développement web",{ from: organisationAccount });
 
     // Organisation 2 creation template dcuments
   await docManager.createTemplateDocument(adressePubliqueOrganisation2,"Visa long séjour",{ from: organisation2Account });
   await docManager.createTemplateDocument(adressePubliqueOrganisation2,"Visa court séjour",{ from: organisation2Account });
+  await docManager.createTemplateDocument(adressePubliqueOrganisation2,"Passeport Talent",{ from: organisation2Account });
+  await docManager.createTemplateDocument(adressePubliqueOrganisation2,"Passeport diplomatique",{ from: organisation2Account });
 
 
 

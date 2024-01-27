@@ -113,6 +113,25 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
+  void refreshHomeScreen() async {
+    List<Document> documentsParticulier =await particularsService.getParticularDocuments(authenticatedUser.publicKey);
+    List<Organisation> FavouriteOrgs = await particularsService.getFavouriteOrgs(EthPrivateKey.fromHex(authenticatedUser.privateKey));
+    List<DocumentRequest> docRequestsSended = await particularsService.getParticularDocRequestsSended(EthPrivateKey.fromHex(authenticatedUser.privateKey));
+    List<GrantRequest> docRequests = await particularsService.getParticularDocGrantRequestsReceived(EthPrivateKey.fromHex(authenticatedUser.privateKey));
+
+
+    print("je passe ici");
+    setState(() {
+      displayedDocuments = documentsParticulier;
+      orgDocuments = FavouriteOrgs;
+
+      request=docRequestsSended;
+      dreq=docRequests;
+
+      //test=request+dreq;
+
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -262,7 +281,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
 
-  static Widget _buildPage3(List<Organisation> FavouriteOrgs, BuildContext context) {
+  static Widget _buildPage3(List<Organisation> FavouriteOrgs, context) {
     return
       SingleChildScrollView(
         child: Container(
@@ -278,12 +297,14 @@ class _HomeScreenState extends State<HomeScreen> {
         
               children: ElevatedButtonBuilder2.buildButtons(
                 organizations: FavouriteOrgs,
-                onPressed: (Organisation organization) {
-                  Navigator.of(context).push(
+                onPressed: (Organisation organization) async {
+                  await Navigator.of(context).push(
                     MaterialPageRoute(
                       builder: (context) => FormOrgScreen(selectedOrganisation: organization),
                     ),
                   );
+
+                  context.state.refreshHomeScreen();
                 },
               ),
               ),
