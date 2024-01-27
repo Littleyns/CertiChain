@@ -89,5 +89,20 @@ class OrganisationsManagerService {
     return res;
   }
 
+  Future<List<Organisation>> getAllOrganisations(EthPrivateKey particularCredentials) async {
+    final contractFunction = contract.function('getAllOrganisations');
+    final result = await _web3Connection.client.call(
+      contract: contract,
+      function: contractFunction,
+      sender: particularCredentials.address,
+      params: [],
+    );
+
+    final organisations = result[0].toList();
+    List<Organisation> res = [];
+    organisations.forEach((org)=>res.add(Organisation.fromJson(org)));
+    return res;
+  }
+
 
 }

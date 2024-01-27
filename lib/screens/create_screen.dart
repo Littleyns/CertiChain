@@ -1,12 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:web3dart/credentials.dart';
 
 import '../models/AuthenticatedUser.dart';
+import '../models/Organisation.dart';
+import '../services/particulars_manager_service.dart';
+import '../services/web3_connection.dart';
 
 
 class CreateScreen extends StatefulWidget {
   final AuthenticatedUser authenticatedUser;
-  const CreateScreen({Key? key, required this.authenticatedUser}) : super(key: key);
+  final Organisation organisation;
+  const CreateScreen({Key? key, required this.authenticatedUser, required this.organisation}) : super(key: key);
 
   @override
   State<CreateScreen> createState() => _CreateScreenState();
@@ -14,6 +19,7 @@ class CreateScreen extends StatefulWidget {
 
 class _CreateScreenState extends State<CreateScreen> {
   final TextEditingController _searchController = TextEditingController();
+  late ParticularsManagerService particularsService;
   bool isFavorite = false;
   int hoveredIndex = -1;
   final List<String> myList = [
@@ -33,6 +39,23 @@ class _CreateScreenState extends State<CreateScreen> {
   List<String> filteredList = [];
 
 
+
+
+  @override
+  void initState() {
+    super.initState();
+    _initializationAsync();
+  }
+  Future<void> _initializationAsync() async {
+    String addressPriveeServer = dotenv.get('PKEY_SERVER');
+    Web3Connection web3Conn = new Web3Connection("http://${dotenv.get('GANACHE_HOST')}:${dotenv.get('GANACHE_PORT')}", "ws://${dotenv.get('GANACHE_HOST')}:${dotenv.get('GANACHE_PORT')}", addressPriveeServer);
+    particularsService = new ParticularsManagerService(web3Conn);
+    await particularsService.initializeContract(); // Maybe show requests also
+    bool orgIsFavourite = await particularsService.orgIsFavourite(EthPrivateKey.fromHex(widget.authenticatedUser.privateKey), widget.organisation.orgAddress);
+    setState(() {
+      isFavorite = orgIsFavourite;
+    });
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -56,7 +79,11 @@ class _CreateScreenState extends State<CreateScreen> {
                     color: isFavorite ? Colors.red : null,
                   ),
                   onPressed: () {
-                    // Toggle the favorite state
+                    if(isFavorite){
+                      particularsService.removeFavouriteOrg(EthPrivateKey.fromHex(widget.authenticatedUser.privateKey), widget.organisation.orgAddress);
+                    }else{
+                      particularsService.addFavouriteOrg(EthPrivateKey.fromHex(widget.authenticatedUser.privateKey), widget.organisation.orgAddress);
+                    }
                     setState(() {
                       isFavorite = !isFavorite;
                     });

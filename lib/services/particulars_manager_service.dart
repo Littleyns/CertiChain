@@ -25,6 +25,16 @@ class ParticularsManagerService {
     this.contract = await _web3Connection.getContract(contractName, contractAddress);
   }
 
+  Future<bool> orgIsFavourite(EthPrivateKey particularCredentials, String orgAddress) async {
+    List<Organisation> favouriteOrgs = await getFavouriteOrgs(particularCredentials);
+    for(Organisation org in favouriteOrgs){
+      if(org.orgAddress == orgAddress){
+        return true;
+      }
+    }
+    return false;
+  }
+
 
   Future<void> createParticular(EthPrivateKey credentials, String particularAddress, String username) async {
     final contractFunction = contract.function('addParticular');

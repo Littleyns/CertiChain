@@ -18,7 +18,9 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await dotenv.load(fileName: ".env");
   String addressPriveeServer = "0x69b39aa2fb86c7172d77d4b87b459ed7643c1e4b052536561e08d7d25592b373";
-  Web3Connection web3Conn = new Web3Connection("http://${dotenv.get('GANACHE_HOST')}:${dotenv.get('GANACHE_PORT')}", "ws://${dotenv.get('GANACHE_HOST')}:${dotenv.get('GANACHE_PORT')}", addressPriveeServer);
+  String defaultHost = "127.0.0.1";
+  String defaultPort = "8545";
+  Web3Connection web3Conn = new Web3Connection("http://${dotenv.env['GANACHE_HOST']??defaultHost}:${dotenv.env['GANACHE_PORT']??defaultPort}", "ws://${dotenv.env['GANACHE_HOST']??defaultHost}:${dotenv.env['GANACHE_PORT']??defaultPort}", addressPriveeServer);
 
   OrganisationsManagerService organisationsService = new OrganisationsManagerService(web3Conn);
   RequestsManagerService requestsService = new RequestsManagerService(web3Conn);

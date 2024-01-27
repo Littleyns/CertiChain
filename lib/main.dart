@@ -73,8 +73,8 @@ class _MyHomePageState extends State<MyHomePage> {
         return HomeScreen();
       case 1:
         return SearchScreen();
-      case 2:
-        return CreateScreen(authenticatedUser: currentUser);
+       //case 2:
+        //return CreateScreen(authenticatedUser: currentUser);
       case 3:
         return BlockchainScreen();
       default:
