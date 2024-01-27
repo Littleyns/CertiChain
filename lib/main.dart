@@ -1,12 +1,13 @@
 import 'package:chatflutter/screens/blockchain_screen.dart';
 import 'package:chatflutter/screens/create_screen.dart';
 import 'package:chatflutter/screens/home_screen.dart';
-import 'package:chatflutter/screens/notifications_screen.dart';
 import 'package:chatflutter/screens/search_screen.dart';
 import 'package:chatflutter/services/web3_connection.dart';
 import 'package:chatflutter/widgets/custom_searchbar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+
+import 'models/AuthenticatedUser.dart';
 
 Future<void> main() async {
   await dotenv.load(fileName: ".env");
@@ -65,6 +66,7 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   int _currentScreenIndex = 0;
+  late AuthenticatedUser currentUser;
   Widget _buildBody() {
     switch (_currentScreenIndex) {
       case 0:
@@ -72,11 +74,9 @@ class _MyHomePageState extends State<MyHomePage> {
       case 1:
         return SearchScreen();
       case 2:
-        return CreateScreen();
+        return CreateScreen(authenticatedUser: currentUser);
       case 3:
         return BlockchainScreen();
-      case 4:
-        return NotificationsScreen();
       default:
         return Container();
     }
@@ -84,6 +84,7 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   void initState() {
     super.initState();
+    currentUser = new AuthenticatedUser(publicKey: '0x0df08E74FFd70cd5D4C28D5bA6261755040E69d1', privateKey: '0x3537081c99dff4618e1f3de8382912a1d7ccf651ade0e015b45b79cf25808384', type: UserType.Particular);
 
   }
 

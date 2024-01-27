@@ -31,7 +31,7 @@ class _BlockchainScreenState extends State<BlockchainScreen> {
 
   }
   Future<void> _initializationAsync() async {
-    String addressPriveeServer = dotenv.get('PKEY_SERVER');
+    String addressPriveeServer = dotenv.env['PKEY_SERVER'] ?? "";
     Web3Connection web3Conn = new Web3Connection("http://${dotenv.get('GANACHE_HOST')}:${dotenv.get('GANACHE_PORT')}", "ws://${dotenv.get('GANACHE_HOST')}:${dotenv.get('GANACHE_PORT')}", addressPriveeServer);
     particularsService = new ParticularsManagerService(web3Conn);
     organisationsService = new OrganisationsManagerService(web3Conn);
