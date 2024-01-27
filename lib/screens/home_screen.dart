@@ -9,6 +9,7 @@ import '../models/AuthenticatedUser.dart';
 import '../models/DocumentRequest.dart';
 import '../models/ElevatedButtonBuilder2.dart';
 import '../models/ElevatedButtonBuilder3.dart';
+import '../models/ElevatedButtonBuilder4.dart';
 import '../models/GrantRequest.dart';
 import '../models/Organisation.dart';
 import '../models/TemplateDocument.dart';
@@ -45,7 +46,8 @@ class _HomeScreenState extends State<HomeScreen> {
   late List<DocumentRequest> request =[];
   late List<GrantRequest> dreq =[];
 
-
+  late List<Object> test=[];
+  List<Object> concatenatedList = [];
 
   @override
   void initState() {
@@ -84,13 +86,19 @@ class _HomeScreenState extends State<HomeScreen> {
       displayedDocuments = baseDocs;
       displayedDocuments = documentsParticulier;
       orgDocuments = FavouriteOrgs;
+
       request=docRequestsSended;
       dreq=docRequests;
+
+      //test=request+dreq;
 
     });
     print(documentsParticulier);
     print(FavouriteOrgs);
-    print(dreq);
+
+    print("ici je print");
+    print(test);
+
 
   }
 
@@ -109,6 +117,7 @@ class _HomeScreenState extends State<HomeScreen> {
               tabs: [
                 Tab(text: 'Certific'),
                 Tab(text: 'Pending'),
+
                 Tooltip(
                   message: 'Favorite organisms',
                   child: Tab(
@@ -132,13 +141,14 @@ class _HomeScreenState extends State<HomeScreen> {
 
 
 
-            if (request.isNotEmpty) _buildPage2(request,context),
+            if (request.isNotEmpty) _buildPage2(request,dreq,context),
             if (request.isEmpty) Container(
               color: Colors.white,
               child: const Center(
                 child: Text("Aucune requête en attente"),
               ),
             ),
+
 
 
             if (orgDocuments.isNotEmpty) _buildPage3(orgDocuments,context),
@@ -182,8 +192,7 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
       );
   }
-  static Widget _buildPage2(List<DocumentRequest> request, BuildContext context) {
-
+  static Widget _buildPage2(List<DocumentRequest> request, List<GrantRequest> dreq, context) {
     return SingleChildScrollView(
       child: Container(
         child: Column(
@@ -195,7 +204,7 @@ class _HomeScreenState extends State<HomeScreen> {
               crossAxisSpacing: 16.0,
               mainAxisSpacing: 16.0,
               shrinkWrap: true,
-      
+
               children: ElevatedButtonBuilder3.buildButtons(
                 documentRequests: request,
                 onPressed: (DocumentRequest request) {
@@ -203,12 +212,29 @@ class _HomeScreenState extends State<HomeScreen> {
                 },
               ),
             ),
-      
+          const SizedBox(height: 20),
+            GridView.count(
+              crossAxisCount: 2,
+              crossAxisSpacing: 16.0,
+              mainAxisSpacing: 16.0,
+              shrinkWrap: true,
+
+              children:
+              ElevatedButtonBuilder4.buildButtons(
+                grantRequests: dreq,
+                onPressed: (GrantRequest dreq) {
+
+                },
+              ),
+            )
+
           ],
         ),
       ),
-    );;
+    );
   }
+
+
   static Widget _buildPage3(List<Organisation> FavouriteOrgs, BuildContext context) {
     return
       SingleChildScrollView(
