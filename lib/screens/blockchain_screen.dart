@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:web3dart/web3dart.dart';
 
@@ -33,7 +32,7 @@ class _BlockchainScreenState extends State<BlockchainScreen> {
   }
   Future<void> _initializationAsync() async {
     String addressPriveeServer = dotenv.get('PKEY_SERVER');
-    Web3Connection web3Conn = new Web3Connection("http://127.0.0.1:7545", "ws://127.0.0.1:7545", addressPriveeServer);
+    Web3Connection web3Conn = new Web3Connection("http://${dotenv.get('GANACHE_HOST')}:${dotenv.get('GANACHE_PORT')}", "ws://${dotenv.get('GANACHE_HOST')}:${dotenv.get('GANACHE_PORT')}", addressPriveeServer);
     particularsService = new ParticularsManagerService(web3Conn);
     organisationsService = new OrganisationsManagerService(web3Conn);
     documentsService = new DocumentsManagerService(web3Conn);

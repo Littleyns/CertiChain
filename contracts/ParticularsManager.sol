@@ -70,6 +70,9 @@ contract ParticularsManager {
     function addDocRequestSended(uint256 requestId,address particularAddress) external {
         particulars[particularAddress].documentRequestsSended.push(requestId);
     }
+    function addDocRequestReceived(uint256 requestId,address particularAddress) external {
+        particulars[particularAddress].documentRequestsReceived.push(requestId);
+    }
     function addDocToParticular(uint256 docId, address _particularAddress) external {
             particulars[_particularAddress].documents.push(docId);
     }
