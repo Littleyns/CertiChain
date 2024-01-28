@@ -3,6 +3,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:web3dart/credentials.dart';
 
 import '../../models/AuthenticatedUser.dart';
+import '../../models/DocumentRequest.dart';
 import '../../models/GrantRequest.dart';
 import '../../models/Particular.dart';
 import '../../models/TemplateDocument.dart';
@@ -40,6 +41,9 @@ void _showPopupDocGranted(BuildContext context, String templateDocName, String r
 }
 
 class DocumentGrantForm extends StatefulWidget {
+  final DocumentRequest? docRequest;
+  DocumentGrantForm({Key? key,  this.docRequest = null}) : super(key: key);
+
   @override
   _MyDocumentGrantFormState createState() => _MyDocumentGrantFormState();
 }
@@ -78,6 +82,12 @@ class _MyDocumentGrantFormState extends State<DocumentGrantForm> {
     } catch (e) {
       // Gérez l'erreur si aucun utilisateur n'est connecté
     }
+    if(widget.docRequest != null){
+      selectedParticular = new Particular(particularAddress: widget.docRequest!.issuerAddress ?? "", username: widget.docRequest!.issuerName, favouriteOrgs: []);
+      selectedTemplateDoc = new TemplateDocument(id: "-1", name: widget.docRequest?.templateDocName??"");
+    }
+
+
     _initializationAsync();
   }
 
@@ -95,6 +105,7 @@ class _MyDocumentGrantFormState extends State<DocumentGrantForm> {
     await organisationService.getOrgTemplateDocuments(user.publicKey);
     setState(() {
       templateDocuments = orgTemplateDocuments;
+      selectedTemplateDoc = selectedTemplateDoc;
     });
   }
 
@@ -114,10 +125,29 @@ class _MyDocumentGrantFormState extends State<DocumentGrantForm> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            ParticularAutocomplete(particularsService: particularsService,inputDecoration: inputDecoration("User public key"),onSelected: selectParticular),
+            widget.docRequest==null
+            ?ParticularAutocomplete(particularsService: particularsService,inputDecoration: inputDecoration("User public key"),onSelected: selectParticular)
+            :TextFormField(
+              readOnly: true,
+              maxLines: 2,
+              controller:TextEditingController(text:'${widget.docRequest?.issuerAddress} (${widget.docRequest?.issuerName})' ?? "placeholder"),
+              decoration: InputDecoration(
+                enabled: false,
+                contentPadding: const EdgeInsets.all(20),
+                labelText: "Particular",
+
+                focusColor: Colors.black,
+                fillColor: Colors.black,
+                enabledBorder: OutlineInputBorder(
+                  borderSide: const BorderSide(width: 3, color: Color(0xff6c5ce7)),
+                  borderRadius: BorderRadius.circular(15),
+                ),
+              ),
+            ),
 
             SizedBox(height: 16.0),
-            Autocomplete<TemplateDocument>(
+            widget.docRequest==null
+                ?Autocomplete<TemplateDocument>(
               fieldViewBuilder: (BuildContext context,
                   TextEditingController textEditingController,
                   FocusNode focusNode,
@@ -147,6 +177,23 @@ class _MyDocumentGrantFormState extends State<DocumentGrantForm> {
                 });
               },
               displayStringForOption: (TemplateDocument option) => option.name,
+            )
+            :TextFormField(
+              readOnly: true,
+              maxLines: 2,
+              controller:TextEditingController(text:'${widget.docRequest?.templateDocName}' ?? "placeholder"),
+              decoration: InputDecoration(
+                enabled: false,
+                contentPadding: const EdgeInsets.all(20),
+                labelText: "Document Template",
+
+                focusColor: Colors.black,
+                fillColor: Colors.black,
+                enabledBorder: OutlineInputBorder(
+                  borderSide: const BorderSide(width: 3, color: Color(0xff6c5ce7)),
+                  borderRadius: BorderRadius.circular(15),
+                ),
+              ),
             ),
 
             SizedBox(height: 16.0),
@@ -209,10 +256,16 @@ class _MyDocumentGrantFormState extends State<DocumentGrantForm> {
                 } else {
                   expirationDate = BigInt.from(selectedDate?.millisecondsSinceEpoch as num);
                 }
-                await requestsService.requestDocumentGrant(EthPrivateKey.fromHex(user.privateKey), selectedParticular.particularAddress, selectedTemplateDoc.id, descriptionController.text, expirationDate);
+                if(widget.docRequest == null){
+                  await requestsService.requestDocumentGrant(EthPrivateKey.fromHex(user.privateKey), selectedParticular.particularAddress, selectedTemplateDoc.id, descriptionController.text, expirationDate);
+                } else {
+                  await requestsService.acceptDocumentRequest(EthPrivateKey.fromHex(user.privateKey), widget.docRequest?.docRequestId ?? "0", descriptionController.text, expirationDate);
+                  Navigator.of(context).pop(true);
+                }
+
                 _showPopupDocGranted(context,selectedTemplateDoc.name, selectedParticular.username);
               },
-              child: Text('Grant !'),
+              child: Text(widget.docRequest==null ?'Grant !': 'Accept Document Request!'),
             ),
           ],
         ),

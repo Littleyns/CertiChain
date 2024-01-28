@@ -123,8 +123,12 @@ console.log(docRequests);
     await requestsManager.requestDocument(adressePubliqueOrganisation,masterReseau.id,{ from: particulierAccount });
     console.log("master spécialisé en Reseau requested from toto to 3iL");
 
+        //Demande d'un master en iot par toto à un organisme
+        await requestsManager.requestDocument(adressePubliqueOrganisation,masterIOT.id,{ from: particulierAccount });
+        console.log("master spécialisé en Reseau requested from toto to 3iL");
+
   // 3il offre un master specialisé en cyber securité à toto
-    await requestsManager.requestDocumentGrant(adressePubliqueParticulier,masterCyber.id,"bien merité certifié owasp",-1,{ from: organisationAccount });
+    await requestsManager.requestDocumentGrant(adressePubliqueParticulier,masterCyber.id,"bien merité certifié ",-1,{ from: organisationAccount });
     console.log("3il granted master spécialisé to toto");
 
     // Consulat X offre un visa de long séjour et un visa de court séjour à toto

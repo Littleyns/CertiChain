@@ -4,6 +4,8 @@ pragma solidity 0.8.19;
 import "./OrganisationsManager.sol";
 import "./ParticularsManager.sol";
 import "./DocumentsManager.sol";
+
+
 contract RequestsManager {
     address public owner;
     OrganisationsManager public orgContract;
@@ -44,6 +46,8 @@ contract RequestsManager {
         string recipientName;
         string issuerName;
         string templateDocName;
+        address recipientAddress;
+        address issuerAddress;
         DocumentTransactionStatus status;
     }
     uint256 public nextGrantRequestId = 0;
@@ -199,10 +203,14 @@ contract RequestsManager {
         return docRequests[i];
     }
     function getDocumentRequestDTO(uint256 i) external view returns (DocumentRequestDTO memory) {
+        ParticularsManager.Particular memory p = particularsContract.getParticular(docRequests[i].issuer);
+        OrganisationsManager.Organisation memory o = orgContract.getOrganisation(docRequests[i].recipient);
         return  DocumentRequestDTO({docRequestId:docRequests[i].docRequestId,
-        recipientName:orgContract.getOrganisation(docRequests[i].recipient).name,
-        issuerName: particularsContract.getParticular(docRequests[i].issuer).username,
+        recipientName:o.name,
+        issuerName: p.username,
         templateDocName:docContract.getTemplateDocument(docRequests[i].templateDocId).name,
+        recipientAddress: o.organisationAddress,
+        issuerAddress: p.particularAddress,
         status:docRequests[i].status});
     }
 

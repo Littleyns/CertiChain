@@ -11,6 +11,7 @@ import 'package:web3dart/credentials.dart';
 
 import '../../models/AuthenticatedUser.dart';
 import '../../models/DocumentRequest.dart';
+import '../../widgets/organisation/document_grant_form.dart';
 import '../../widgets/particular/FavOrgsElevatedBuilder.dart';
 import '../../models/GrantRequest.dart';
 import '../../models/Organisation.dart';
@@ -203,16 +204,20 @@ class _HomeScreenState extends State<HomeScreen> {
 
                   },
                   onAccepted: (AuthenticatedUser user, DocumentRequest requestReceived, RequestsManagerService reqService) async {
-                    await reqService.acceptGrantedDocument(EthPrivateKey.fromHex(user.privateKey), requestReceived.docRequestId);
+                    // rediriger vers un formulaire
+                    await Navigator.of(context).push(MaterialPageRoute(
+                      builder: (context) => DocumentGrantForm(docRequest: requestReceived,),
+                    ),);
+                    //await reqService.acceptDocumentRequest(EthPrivateKey.fromHex(user.privateKey), requestReceived.docRequestId);
                     print("Document accepté");
-                    await context.state.refreshGrantedDocs();
+                    await context.state.refreshHomeScreen();
 
                   },
 
                   onRefused: (AuthenticatedUser user, DocumentRequest requestReceived, RequestsManagerService reqService) async {
-                    await reqService.rejectDocumentGrant(EthPrivateKey.fromHex(user.privateKey), requestReceived.docRequestId);
+                    await reqService.rejectDocumentRequest(EthPrivateKey.fromHex(user.privateKey), requestReceived.docRequestId);
                     print("Document accepté");
-                    await context.state.refreshGrantedDocs();
+                    await context.state.refreshHomeScreen();
                     print("doc refused");
                   }
               ),

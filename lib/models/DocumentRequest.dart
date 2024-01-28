@@ -6,6 +6,8 @@ class DocumentRequest { // C'est la demande de document par un particulier à un
   String recipientName;
   String templateDocName;
   DocumentTransactionStatus status;
+  String ?recipientAddress;
+  String ?issuerAddress;
 
   DocumentRequest({
     required this.docRequestId,
@@ -20,6 +22,8 @@ class DocumentRequest { // C'est la demande de document par un particulier à un
         issuerName = json[2].toString() as String,
         recipientName = json[1].toString() as String,
         templateDocName = json[3].toString() as String ,
-        status = statusFromIdentifier(json[4].toString());
+        recipientAddress = json[4].toString() as String,
+        issuerAddress = json[5].toString() as String,
+        status = statusFromIdentifier(json[6].toString());
 
 }
