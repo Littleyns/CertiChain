@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:web3dart/credentials.dart';
 
-import '../models/AuthenticatedUser.dart';
-import '../models/Organisation.dart';
-import '../services/particulars_manager_service.dart';
-import '../services/user_session.dart';
-import '../services/web3_connection.dart';
+import '../../models/AuthenticatedUser.dart';
+import '../../models/Organisation.dart';
+import '../../services/particulars_manager_service.dart';
+import '../../services/user_session.dart';
+import '../../services/web3_connection.dart';
 
 
 class CreateScreen extends StatefulWidget {

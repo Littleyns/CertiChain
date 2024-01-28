@@ -1,25 +1,25 @@
 import 'package:chatflutter/services/requests_manager_service.dart';
 import 'package:flutter/material.dart';
-import 'package:chatflutter/widgets/ElevatedButtonBuilder.dart';
+import 'package:chatflutter/widgets/particular/DocumentsElevatedBuilder.dart';
 import 'package:chatflutter/services/web3_connection.dart';
 import 'package:flutter/widgets.dart' show WidgetsFlutterBinding;
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:web3dart/credentials.dart';
 
-import '../models/AuthenticatedUser.dart';
-import '../models/DocumentRequest.dart';
-import '../widgets/ElevatedButtonBuilder2.dart';
-import '../widgets/ElevatedButtonBuilder3.dart';
-import '../widgets/ElevatedButtonBuilder4.dart';
-import '../models/GrantRequest.dart';
-import '../models/Organisation.dart';
-import '../models/TemplateDocument.dart';
-import '../models/Document.dart';
-import '../services/organisations_manager_service.dart';
-import '../services/particulars_manager_service.dart';
-import '../services/user_session.dart';
-import '../widgets/form_organisation.dart';
-import 'create_screen.dart';
+import '../../models/AuthenticatedUser.dart';
+import '../../models/DocumentRequest.dart';
+import '../../widgets/particular/FavOrgsElevatedBuilder.dart';
+import '../../models/GrantRequest.dart';
+import '../../models/Organisation.dart';
+import '../../models/TemplateDocument.dart';
+import '../../models/Document.dart';
+import '../../services/organisations_manager_service.dart';
+import '../../services/particulars_manager_service.dart';
+import '../../services/user_session.dart';
+import '../../widgets/particular/DocRequestsSendedElevatedBuilder.dart';
+import '../../widgets/particular/GrantRequestsReceivedElevatedBuilder.dart';
+import '../../widgets/particular/form_organisation.dart';
+import '../organisation/create_screen.dart';
 
 class HomeScreen extends StatefulWidget {
 
@@ -145,7 +145,7 @@ class _HomeScreenState extends State<HomeScreen> {
               indicatorSize: TabBarIndicatorSize.label,
               tabs: [
                 Tab(text: 'Certific'),
-                Tab(text: 'Pending'),
+                Tab(text: 'Requests'),
 
                 Tooltip(
                   message: 'Favorite organisms',
@@ -210,7 +210,7 @@ class _HomeScreenState extends State<HomeScreen> {
               mainAxisSpacing: 16.0,
               shrinkWrap: true,
               physics: NeverScrollableScrollPhysics(),
-              children: ElevatedButtonBuilder.buildButtons(
+              children: DocumentsElevatedBuilder.buildButtons(
                 documents: documentsParticulier,
                 onPressed: (Document document) {
                   // Action lors du clic sur un bouton
@@ -234,46 +234,35 @@ class _HomeScreenState extends State<HomeScreen> {
               mainAxisSpacing: 16.0,
               shrinkWrap: true,
 
-              children: ElevatedButtonBuilder3.buildButtons(
+              children: DocRequestsSendedElevatedBuilder.buildButtons(
                 documentRequests: request,
                 onPressed: (DocumentRequest request) {
 
                 },
 
-              ),
-            ),
-          const SizedBox(height: 20),
-            GridView.count(
-              crossAxisCount: 2,
-              crossAxisSpacing: 16.0,
-              mainAxisSpacing: 16.0,
-              shrinkWrap: true,
+              )+GrantRequestsReceivedElevatedBuilder.buildButtons(
+                  grantRequests: dreq,
+                  reqService : requestsService,
+                  onPressed: (GrantRequest dreq) {
 
-              children:
-              ElevatedButtonBuilder4.buildButtons(
-                grantRequests: dreq,
-                reqService : requestsService,
-                onPressed: (GrantRequest dreq) {
-
-                },
+                  },
                   onAccepted: (AuthenticatedUser user, GrantRequest dreq, RequestsManagerService reqService) async {
-                      // Vous pouvez effectuer votre action ici (par exemple, accepter le document)
-                      await reqService.acceptGrantedDocument(EthPrivateKey.fromHex(user.privateKey), dreq.grantRequestId);
-                      print("Document accepté");
-                      await context.state.refreshGrantedDocs();
+                    // Vous pouvez effectuer votre action ici (par exemple, accepter le document)
+                    await reqService.acceptGrantedDocument(EthPrivateKey.fromHex(user.privateKey), dreq.grantRequestId);
+                    print("Document accepté");
+                    await context.state.refreshGrantedDocs();
 
                   },
 
-                onRefused: (AuthenticatedUser user, GrantRequest dreq, RequestsManagerService reqService) async {
-                  //reqService.acceptGrantedDocument(EthPrivateKey.fromHex(user.privateKey), dreq.grantRequestId);
-                  await reqService.rejectDocumentGrant(EthPrivateKey.fromHex(user.privateKey), dreq.grantRequestId);
-                  print("Document accepté");
-                  await context.state.refreshGrantedDocs();
-                  print("doc refused");
-                }
+                  onRefused: (AuthenticatedUser user, GrantRequest dreq, RequestsManagerService reqService) async {
+                    //reqService.acceptGrantedDocument(EthPrivateKey.fromHex(user.privateKey), dreq.grantRequestId);
+                    await reqService.rejectDocumentGrant(EthPrivateKey.fromHex(user.privateKey), dreq.grantRequestId);
+                    print("Document accepté");
+                    await context.state.refreshGrantedDocs();
+                    print("doc refused");
+                  }
               ),
-            )
-
+            ),
           ],
         ),
       ),
@@ -295,7 +284,7 @@ class _HomeScreenState extends State<HomeScreen> {
               mainAxisSpacing: 16.0,
               shrinkWrap: true,
         
-              children: ElevatedButtonBuilder2.buildButtons(
+              children: FavOrgsElevatedBuilder.buildButtons(
                 organizations: FavouriteOrgs,
                 onPressed: (Organisation organization) async {
                   await Navigator.of(context).push(

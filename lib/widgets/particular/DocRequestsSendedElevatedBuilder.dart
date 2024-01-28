@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 
-import '../models/Consts.dart';
-import '../models/DocumentRequest.dart';
+import 'package:chatflutter/models/Consts.dart';
+import 'package:chatflutter/models/DocumentRequest.dart';
 
 
 
 
-class ElevatedButtonBuilder3 {
+class DocRequestsSendedElevatedBuilder {
   static List<Widget> buildButtons({
     required List<DocumentRequest> documentRequests,
     required Function(DocumentRequest) onPressed,

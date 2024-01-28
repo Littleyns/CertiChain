@@ -1,15 +1,19 @@
 import 'package:chatflutter/models/Consts.dart';
+import 'package:chatflutter/models/Document.dart';
 import 'package:flutter/material.dart';
-import '../models/AuthenticatedUser.dart';
-import '../models/GrantRequest.dart';
-import '../services/requests_manager_service.dart';
-import '../services/user_session.dart';
+import 'package:chatflutter/models/AuthenticatedUser.dart';
+import 'package:chatflutter/models/GrantRequest.dart';
+import 'package:chatflutter/services/requests_manager_service.dart';
+import 'package:chatflutter/services/user_session.dart';
+
+import '../../models/DocumentRequest.dart';
 
 
-class ElevatedButtonBuilder4 {
+class RequestSendedElevatedBuilder {
   static List<Widget> buildButtons({
     required List<GrantRequest> grantRequests,
-    required Function(GrantRequest) onPressed, required Function(AuthenticatedUser user, GrantRequest dreq, RequestsManagerService reqService) onAccepted,required Function(AuthenticatedUser user, GrantRequest dreq, RequestsManagerService reqService) onRefused, required RequestsManagerService reqService
+    required Function(GrantRequest) onPressed
+
   }) {
     List<Widget> buttons = [];
 
@@ -54,7 +58,7 @@ class ElevatedButtonBuilder4 {
             ),
             SizedBox(height: 8.0),
             Text(
-              "Status: ${request.status.name}",
+              "Description: ${request.doc.description}",
               textAlign: TextAlign.center,
               style: TextStyle(
                 color: Colors.white,
@@ -62,31 +66,24 @@ class ElevatedButtonBuilder4 {
               ),
             ),
             SizedBox(height: 8.0),
-            request.status==DocumentTransactionStatus.Pending?Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                ElevatedButton(onPressed: () => onAccepted(UserSession.currentUser, request,reqService),style:ElevatedButton.styleFrom(
-                  primary: Colors.white,
-                  shape: ContinuousRectangleBorder(
-                    borderRadius: BorderRadius.circular(10.0),
-                  ),
-                ), child: Text("Accepter",style:TextStyle(
-                  color: Colors.green,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 12.0,
-                ))),
-                SizedBox(width: 8.0),
-                ElevatedButton(onPressed: () => onRefused(UserSession.currentUser, request,reqService),style:ElevatedButton.styleFrom(
-                  primary: Colors.white,
-                  shape: ContinuousRectangleBorder(
-                    borderRadius: BorderRadius.circular(10.0),
-                  ),
-                ),child: Text("Refuser",style:TextStyle(
-                  color: Colors.red,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 12.0,
-                ))),
-            ],):SizedBox(height: 8.0)
+            Text(
+              "Date d'expiration: ${request.doc.getExpirationDateTime()}",
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 15.0,
+              ),
+            ),
+            SizedBox(height: 8.0),
+            Text(
+              "Status: ${request.status.name}",
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 15.0,
+              ),
+            ),
+
           ],
         ),
       );

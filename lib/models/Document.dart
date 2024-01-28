@@ -19,7 +19,9 @@ class Document {
     required this.expirationDate,
   });
 
-
+  String getExpirationDateTime(){
+    return expirationDate.toInt()!=-1 ? DateTime.fromMillisecondsSinceEpoch(expirationDate.toInt()).toString() : "No Expiration";
+  }
   Document.fromJson(List<dynamic> json)
       : docId = json[0].toString() as String,
         templateDocName = json[1].toString() as String,

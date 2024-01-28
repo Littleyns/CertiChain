@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:web3dart/web3dart.dart';
 
-import '../models/Document.dart';
-import '../services/documents_manager_service.dart';
-import '../services/organisations_manager_service.dart';
-import '../services/particulars_manager_service.dart';
-import '../services/web3_connection.dart';
+import '../../models/Document.dart';
+import '../../services/documents_manager_service.dart';
+import '../../services/organisations_manager_service.dart';
+import '../../services/particulars_manager_service.dart';
+import '../../services/web3_connection.dart';
 
 class BlockchainScreen extends StatefulWidget {
   @override
@@ -172,7 +172,7 @@ class _BlockchainScreenState extends State<BlockchainScreen> {
                   SizedBox(height: 8.0),
                   Text('org transmitter: ${displayedDocuments[index].organisationEmitter}'),
                   SizedBox(height: 8.0),
-                  Text('Expiration date: ${displayedDocuments[index].expirationDate.toInt() == -1 ? "-": new DateTime.fromMicrosecondsSinceEpoch(displayedDocuments[index].expirationDate.toInt())}'),
+                  Text('Expiration date: ${displayedDocuments[index].getExpirationDateTime()}'),
                 ],
               ),
             ),

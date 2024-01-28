@@ -96,10 +96,22 @@ contract OrganisationsManager {
             msg.sender == owner || msg.sender == _orgAddress,
             "bad sender"
         );
-        uint256[] memory orgRequestReceivedIds = organisations[msg.sender].documentRequestsReceived;
+        uint256[] memory orgRequestReceivedIds = organisations[_orgAddress].documentRequestsReceived;
         RequestsManager.DocumentRequestDTO[] memory res = new RequestsManager.DocumentRequestDTO[](orgRequestReceivedIds.length);
         for(uint256 i = 0 ; i<orgRequestReceivedIds.length;i++){
             res[i] = reqsContract.getDocumentRequestDTO(orgRequestReceivedIds[i]);
+        }
+        return res;
+    }
+    function getOrgGrantRequestsSended(address _orgAddress) external view returns(RequestsManager.GrantRequestDTO[] memory){
+        require(
+            msg.sender == owner || msg.sender == _orgAddress,
+            "bad sender"
+        );
+        uint256[] memory orgGrantRequestSendedIds = organisations[_orgAddress].documentRequestsGranted;
+        RequestsManager.GrantRequestDTO[] memory res = new RequestsManager.GrantRequestDTO[](orgGrantRequestSendedIds.length);
+        for(uint256 i = 0 ; i<orgGrantRequestSendedIds.length;i++){
+            res[i] = reqsContract.getGrantRequestDTO(orgGrantRequestSendedIds[i]);
         }
         return res;
     }
