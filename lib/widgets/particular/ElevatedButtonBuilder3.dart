@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import '../models/Consts.dart';
-import '../models/DocumentRequest.dart';
+import 'package:chatflutter/models/Consts.dart';
+import 'package:chatflutter/models/DocumentRequest.dart';
 
 
 

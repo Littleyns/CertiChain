@@ -1,23 +1,33 @@
-import 'package:chatflutter/models/Consts.dart';
 import 'package:flutter/material.dart';
-import '../models/AuthenticatedUser.dart';
-import '../models/GrantRequest.dart';
-import '../services/requests_manager_service.dart';
-import '../services/user_session.dart';
+
+import 'package:chatflutter/models/Consts.dart';
+import 'package:chatflutter/models/DocumentRequest.dart';
+
+import '../../models/AuthenticatedUser.dart';
+import '../../services/requests_manager_service.dart';
+import '../../services/user_session.dart';
 
 
-class ElevatedButtonBuilder4 {
+
+
+class RequestReceivedElevatedBuilder {
   static List<Widget> buildButtons({
-    required List<GrantRequest> grantRequests,
-    required Function(GrantRequest) onPressed, required Function(AuthenticatedUser user, GrantRequest dreq, RequestsManagerService reqService) onAccepted,required Function(AuthenticatedUser user, GrantRequest dreq, RequestsManagerService reqService) onRefused, required RequestsManagerService reqService
+    required List<DocumentRequest> documentRequests,
+    required Function(DocumentRequest) onPressed,
+    required Function(AuthenticatedUser user, DocumentRequest dreq, RequestsManagerService reqService) onAccepted,
+    required Function(AuthenticatedUser user, DocumentRequest dreq, RequestsManagerService reqService) onRefused,
+    required RequestsManagerService reqService
+
   }) {
     List<Widget> buttons = [];
 
-    for (int i = 0; i < grantRequests.length; i++) {
-      GrantRequest request = grantRequests[i];
+    for (int i = 0; i < documentRequests.length; i++) {
+      String issuerName = documentRequests[i].issuerName;
+      String templateDocName = documentRequests[i].templateDocName;
+      String status = documentRequests[i].status.name;
 
       ElevatedButton button = ElevatedButton(
-        onPressed: () => onPressed(request),
+        onPressed: () => onPressed(documentRequests[i]),
         style: ElevatedButton.styleFrom(
           primary: i % 2 == 0 ? Colors.black : Colors.grey,
           shape: RoundedRectangleBorder(
@@ -28,7 +38,7 @@ class ElevatedButtonBuilder4 {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text(
-              "Issuer: ${request.issuerName}",
+              issuerName,
               textAlign: TextAlign.center,
               style: TextStyle(
                 color: Colors.white,
@@ -36,7 +46,7 @@ class ElevatedButtonBuilder4 {
             ),
             SizedBox(height: 8.0),
             Text(
-              "Recipient: ${request.recipientName}",
+              templateDocName,
               textAlign: TextAlign.center,
               style: TextStyle(
                 color: Colors.white,
@@ -45,7 +55,7 @@ class ElevatedButtonBuilder4 {
             ),
             SizedBox(height: 8.0),
             Text(
-              "Template Doc: ${request.doc.templateDocName}",
+              status,
               textAlign: TextAlign.center,
               style: TextStyle(
                 color: Colors.white,
@@ -53,19 +63,10 @@ class ElevatedButtonBuilder4 {
               ),
             ),
             SizedBox(height: 8.0),
-            Text(
-              "Status: ${request.status.name}",
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 15.0,
-              ),
-            ),
-            SizedBox(height: 8.0),
-            request.status==DocumentTransactionStatus.Pending?Row(
+            documentRequests[i].status==DocumentTransactionStatus.Pending?Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                ElevatedButton(onPressed: () => onAccepted(UserSession.currentUser, request,reqService),style:ElevatedButton.styleFrom(
+                ElevatedButton(onPressed: () => onAccepted(UserSession.currentUser, documentRequests[i],reqService),style:ElevatedButton.styleFrom(
                   primary: Colors.white,
                   shape: ContinuousRectangleBorder(
                     borderRadius: BorderRadius.circular(10.0),
@@ -76,7 +77,7 @@ class ElevatedButtonBuilder4 {
                   fontSize: 12.0,
                 ))),
                 SizedBox(width: 8.0),
-                ElevatedButton(onPressed: () => onRefused(UserSession.currentUser, request,reqService),style:ElevatedButton.styleFrom(
+                ElevatedButton(onPressed: () => onRefused(UserSession.currentUser, documentRequests[i],reqService),style:ElevatedButton.styleFrom(
                   primary: Colors.white,
                   shape: ContinuousRectangleBorder(
                     borderRadius: BorderRadius.circular(10.0),
@@ -86,7 +87,7 @@ class ElevatedButtonBuilder4 {
                   fontWeight: FontWeight.bold,
                   fontSize: 12.0,
                 ))),
-            ],):SizedBox(height: 8.0)
+              ],):SizedBox(height: 8.0)
           ],
         ),
       );
@@ -96,4 +97,6 @@ class ElevatedButtonBuilder4 {
 
     return buttons;
   }
+
+
 }

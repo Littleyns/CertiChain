@@ -6,6 +6,7 @@ import 'package:chatflutter/services/web3_connection.dart';
 import 'package:web3dart/web3dart.dart';
 
 import '../models/Organisation.dart';
+import '../models/Particular.dart';
 
 class ParticularsManagerService {
   late Web3Connection _web3Connection;
@@ -21,6 +22,18 @@ class ParticularsManagerService {
   Future<void> initializeContract() async {
     EthereumAddress contractAddress = await _web3Connection.getContractAddress(contractName);
     this.contract = await _web3Connection.getContract(contractName, contractAddress);
+  }
+
+  Future<String> getParticularName(String particularAddress) async {
+    final contractFunction = contract.function('getParticular');
+    final result = await _web3Connection.client.call(
+      contract: contract,
+      function: contractFunction,
+      params: [EthereumAddress.fromHex(particularAddress)],
+    );
+
+    final particular = result[0].toList();
+    return particular[1];
   }
 
   Future<bool> orgIsFavourite(EthPrivateKey particularCredentials, String orgAddress) async {
@@ -147,6 +160,8 @@ class ParticularsManagerService {
       fetchChainIdFromNetworkId: false,
     );
   }
+
+
 
 
 

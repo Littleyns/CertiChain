@@ -1,25 +1,25 @@
 import 'package:chatflutter/services/requests_manager_service.dart';
 import 'package:flutter/material.dart';
-import 'package:chatflutter/widgets/ElevatedButtonBuilder.dart';
+import 'package:chatflutter/widgets/particular/ElevatedButtonBuilder.dart';
 import 'package:chatflutter/services/web3_connection.dart';
 import 'package:flutter/widgets.dart' show WidgetsFlutterBinding;
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:web3dart/credentials.dart';
 
-import '../models/AuthenticatedUser.dart';
-import '../models/DocumentRequest.dart';
-import '../widgets/ElevatedButtonBuilder2.dart';
-import '../widgets/ElevatedButtonBuilder3.dart';
-import '../widgets/ElevatedButtonBuilder4.dart';
-import '../models/GrantRequest.dart';
-import '../models/Organisation.dart';
-import '../models/TemplateDocument.dart';
-import '../models/Document.dart';
-import '../services/organisations_manager_service.dart';
-import '../services/particulars_manager_service.dart';
-import '../services/user_session.dart';
-import '../widgets/form_organisation.dart';
-import 'create_screen.dart';
+import '../../models/AuthenticatedUser.dart';
+import '../../models/DocumentRequest.dart';
+import '../../widgets/particular/ElevatedButtonBuilder2.dart';
+import '../../models/GrantRequest.dart';
+import '../../models/Organisation.dart';
+import '../../models/TemplateDocument.dart';
+import '../../models/Document.dart';
+import '../../services/organisations_manager_service.dart';
+import '../../services/particulars_manager_service.dart';
+import '../../services/user_session.dart';
+import '../../widgets/particular/ElevatedButtonBuilder3.dart';
+import '../../widgets/particular/ElevatedButtonBuilder4.dart';
+import '../../widgets/particular/form_organisation.dart';
+import '../organisation/create_screen.dart';
 
 class HomeScreen extends StatefulWidget {
 
@@ -145,7 +145,7 @@ class _HomeScreenState extends State<HomeScreen> {
               indicatorSize: TabBarIndicatorSize.label,
               tabs: [
                 Tab(text: 'Certific'),
-                Tab(text: 'Pending'),
+                Tab(text: 'Requests'),
 
                 Tooltip(
                   message: 'Favorite organisms',

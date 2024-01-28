@@ -1,5 +1,5 @@
 
-import 'package:chatflutter/screens/search_screen.dart';
+import 'package:chatflutter/screens/particular/search_screen.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -10,10 +10,10 @@ import '../models/Organisation.dart';
 import '../services/organisations_manager_service.dart';
 import '../services/user_session.dart';
 import '../services/web3_connection.dart';
-import '../widgets/custom_searchbar.dart';
-import 'blockchain_screen.dart';
-import 'create_screen.dart';
-import 'home_screen.dart';
+import '../widgets/particular/custom_searchbar.dart';
+import 'common/blockchain_screen.dart';
+import 'organisation/create_screen.dart';
+import 'particular/home_screen.dart';
 
 class MainParticulars extends StatefulWidget {
   const MainParticulars({super.key, required this.title});
@@ -35,8 +35,6 @@ class _MainParticularsState extends State<MainParticulars> {
       case 1:
         return SearchScreen();
       case 2:
-        return CreateScreen(organisation: allOrgs[0]);
-      case 3:
         return BlockchainScreen();
       default:
         return Container();
@@ -102,10 +100,6 @@ class _MainParticularsState extends State<MainParticulars> {
           BottomNavigationBarItem(
             icon: Icon(Icons.search),
             label: 'Search',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.add),
-            label: 'Create',
           ),
           BottomNavigationBarItem(
             icon: Image.asset(

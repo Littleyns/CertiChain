@@ -1,5 +1,5 @@
 
-import 'package:chatflutter/screens/search_screen.dart';
+import 'package:chatflutter/screens/particular/search_screen.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -10,10 +10,11 @@ import '../models/Organisation.dart';
 import '../services/organisations_manager_service.dart';
 import '../services/user_session.dart';
 import '../services/web3_connection.dart';
-import '../widgets/custom_searchbar.dart';
-import 'blockchain_screen.dart';
-import 'create_screen.dart';
-import 'home_screen.dart';
+import '../widgets/organisation/document_grant_form.dart';
+import '../widgets/particular/custom_searchbar.dart';
+import 'common/blockchain_screen.dart';
+import 'organisation/create_screen.dart';
+import 'organisation/home_screen.dart';
 
 class MainOrganisations extends StatefulWidget {
   const MainOrganisations({super.key, required this.title});
@@ -26,17 +27,14 @@ class MainOrganisations extends StatefulWidget {
 class _MainOrganisationsState extends State<MainOrganisations> {
   int _currentScreenIndex = 0;
   late AuthenticatedUser currentUser;
-  late List<Organisation> allOrgs = []; //FIXME! to remove later after implementing search organisation screen
 
   Widget _buildBody() {
     switch (_currentScreenIndex) {
       case 0:
         return HomeScreen();
       case 1:
-        return SearchScreen();
+        return DocumentGrantForm();
       case 2:
-        return CreateScreen(organisation: allOrgs[0]);
-      case 3:
         return BlockchainScreen();
       default:
         return Container();
@@ -47,14 +45,12 @@ class _MainOrganisationsState extends State<MainOrganisations> {
 
     super.initState();
     // Simulation d'une authentification
-    UserSession.loginUser(new AuthenticatedUser(publicKey: '0x0df08E74FFd70cd5D4C28D5bA6261755040E69d1', privateKey: '0x3537081c99dff4618e1f3de8382912a1d7ccf651ade0e015b45b79cf25808384', type: UserType.Particular));
     try {
       currentUser = UserSession.currentUser;
       // Utilisez currentUser ici
     } catch (e) {
       // Gérez l'erreur si aucun utilisateur n'est connecté
     }
-    allOrgs.add(new Organisation(orgAddress: '12345',domain: Domain.Education,name: "placeholder org(noOrgsFound)"));
     _initializationAsync();
   }
   Future<void> _initializationAsync() async {
@@ -63,11 +59,6 @@ class _MainOrganisationsState extends State<MainOrganisations> {
 
     OrganisationsManagerService organisationsService = new OrganisationsManagerService(web3Conn);
     await organisationsService.initializeContract();
-    allOrgs = await organisationsService.getAllOrganisations(EthPrivateKey.fromHex(currentUser.privateKey));
-    // Handle the case of no orgs found or not filled blockchain
-    if(allOrgs.length == 0){
-      allOrgs.add(new Organisation(orgAddress: '12345',domain: Domain.Education,name: "placeholder org(noOrgsFound)"));
-    }
   }
   @override
   Widget build(BuildContext context) {
@@ -98,10 +89,6 @@ class _MainOrganisationsState extends State<MainOrganisations> {
           BottomNavigationBarItem(
             icon: Icon(Icons.home),
             label: 'Home',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.search),
-            label: 'Search',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.add),

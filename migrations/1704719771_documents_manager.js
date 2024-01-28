@@ -61,6 +61,7 @@ module.exports = async function (deployer, network, accounts) {
   await docManager.createTemplateDocument(adressePubliqueOrganisation,"Master spécialisé cybsecurité",{ from: organisationAccount });
   await docManager.createTemplateDocument(adressePubliqueOrganisation,"Master spécialisé en IOT",{ from: organisationAccount });
   await docManager.createTemplateDocument(adressePubliqueOrganisation,"Master spécialisé développement web",{ from: organisationAccount });
+  await docManager.createTemplateDocument(adressePubliqueOrganisation,"Master spécialisé en infrastructures & réseaux",{ from: organisationAccount });
 
     // Organisation 2 creation template dcuments
   await docManager.createTemplateDocument(adressePubliqueOrganisation2,"Visa long séjour",{ from: organisation2Account });
@@ -76,6 +77,7 @@ module.exports = async function (deployer, network, accounts) {
   var diplomeInge = templateDocuments[0];
   var masterSpecialise= templateDocuments[1];
   var masterCyber= templateDocuments[2];
+  var masterReseau = templateDocuments[5]
 
   // Récupération des documents de l'organisme 2
   var templateDocuments2 = await orgManager.getOrgTemplateDocuments(adressePubliqueOrganisation2);
@@ -100,6 +102,10 @@ var docRequests = await orgManager.getOrgRequestsReceived(adressePubliqueOrganis
     await requestsManager.acceptDocumentRequest(docRequest.docRequestId, "well deserved doc", -1,{ from: organisationAccount }); // changer l'id, récuperer toutes les requetes d'un utilisateur
     console.log("Document accepted from organisation");
   }
+
+    //Demande d'un document par toto à un organisme
+    await requestsManager.requestDocument(adressePubliqueOrganisation,masterReseau.id,{ from: particulierAccount });
+    console.log("master spécialisé en Reseau requested from toto to 3iL");
 
   // 3il offre un master specialisé en cyber securité à toto
     await requestsManager.requestDocumentGrant(adressePubliqueParticulier,masterCyber.id,"bien merité certifié owasp",-1,{ from: organisationAccount });

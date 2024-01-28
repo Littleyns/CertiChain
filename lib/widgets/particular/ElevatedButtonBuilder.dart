@@ -1,22 +1,19 @@
-
 import 'package:flutter/material.dart';
-import '../models/Document.dart';
-import '../models/Organisation.dart';
-
-
-class ElevatedButtonBuilder2 {
+import 'package:chatflutter/models/Document.dart';
+class ElevatedButtonBuilder {
   static List<Widget> buildButtons({
-    required List<Organisation> organizations,
-    required Function onPressed,
+    required List<Document> documents,
+    required Function(Document) onPressed,
   }) {
     List<Widget> buttons = [];
 
-    for (int i = 0; i < organizations.length; i++) {
-      String name = organizations[i].name;
-      String domain = _getDomainString(organizations[i].domain);
+    for (int i = 0; i < documents.length; i++) {
+      String templateDocName = documents[i].templateDocName;
+      //String description = documents[i].description;
+      //String owner = documents[i].ParticularOwner;
 
       ElevatedButton button = ElevatedButton(
-        onPressed: () => onPressed(organizations[i]),
+        onPressed: () => onPressed(documents[i]),
         style: ElevatedButton.styleFrom(
           primary: i % 2 == 0 ? Colors.black : Colors.grey,
           shape: RoundedRectangleBorder(
@@ -27,21 +24,30 @@ class ElevatedButtonBuilder2 {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text(
-              name,
+              templateDocName,
               textAlign: TextAlign.center,
               style: TextStyle(
                 color: Colors.white,
               ),
             ),
-            SizedBox(height: 8.0),
+            /*SizedBox(height: 8.0),
             Text(
-              domain,
+              description,
               textAlign: TextAlign.center,
               style: TextStyle(
                 color: Colors.white,
                 fontSize: 12.0,
               ),
             ),
+            SizedBox(height: 8.0),
+            Text(
+              owner,
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 12.0,
+              ),
+            ),*/
           ],
         ),
       );
@@ -51,18 +57,4 @@ class ElevatedButtonBuilder2 {
 
     return buttons;
   }
-
-  static String _getDomainString(Domain domain) {
-    switch (domain) {
-      case Domain.Government:
-        return 'Government';
-      case Domain.Education:
-        return 'Education';
-      case Domain.Banking:
-        return 'Banking';
-      default:
-        return 'Unknown';
-    }
-  }
-
 }

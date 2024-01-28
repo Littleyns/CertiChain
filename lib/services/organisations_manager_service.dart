@@ -5,6 +5,7 @@ import 'package:chatflutter/models/TemplateDocument.dart';
 import 'package:chatflutter/services/web3_connection.dart';
 import 'package:web3dart/web3dart.dart';
 
+import '../models/GrantRequest.dart';
 import '../models/Organisation.dart';
 
 class OrganisationsManagerService {
@@ -50,7 +51,21 @@ class OrganisationsManagerService {
 
     final documentRequests = result[0].toList();
     List<DocumentRequest> res = [];
-    documentRequests.forEach((document)=>res.add(DocumentRequest.fromJson(document)));
+    documentRequests.forEach((requestReceived)=>res.add(DocumentRequest.fromJson(requestReceived)));
+    return res;
+  }
+  Future<List<GrantRequest>> getOrgGrantRequestsSended(EthPrivateKey credentials, String orgAddress) async {
+    final contractFunction = contract.function('getOrgGrantRequestsSended');
+    final result = await _web3Connection.client.call(
+      contract: contract,
+      function: contractFunction,
+      sender: credentials.address,
+      params: [EthereumAddress.fromHex(orgAddress)],
+    );
+
+    final grantRequests = result[0].toList();
+    List<GrantRequest> res = [];
+    grantRequests.forEach((grantRequest)=>res.add(GrantRequest.fromJson(grantRequest)));
     return res;
   }
 
