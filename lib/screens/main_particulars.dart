@@ -77,9 +77,12 @@ class _MainParticularsState extends State<MainParticulars> {
     return Scaffold(
       appBar:  PreferredSize(
         preferredSize: Size.fromHeight(80.0), // Hauteur personnalisée de la barre de recherche
-        child: Padding(
-            padding: const EdgeInsets.all(16),
-            child:CustomSearchBar()),
+        child: Image.asset(
+          'assets/images/logo.png',
+          width: 120, // Largeur personnalisée
+          height: 100, // Hauteur personnalisée
+          fit: BoxFit.contain, // Ajuster l'image dans les limites définies
+        )
       ),
       body:Container(padding: EdgeInsets.all(16.0),child:_buildBody()),
       bottomNavigationBar: BottomNavigationBar(
