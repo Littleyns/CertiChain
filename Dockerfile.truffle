@@ -1,0 +1,17 @@
+# Utilisez l'image Node.js avec Truffle installé
+FROM node:18
+
+# Définissez le répertoire de travail dans le conteneur
+WORKDIR /app
+
+# Copiez les fichiers de votre projet dans le conteneur
+COPY . .
+
+EXPOSE 8545
+
+# Installez Truffle globalement
+RUN npm install -g truffle
+
+# Exécutez la commande de migration
+RUN truffle develop
+CMD ["truffle", "migrate", "--reset"]

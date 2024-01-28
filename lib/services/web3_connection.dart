@@ -1,7 +1,5 @@
-// web3_service.dart
+// web3_service.txt
 import 'dart:convert';
-import 'dart:html';
-
 import 'package:flutter/services.dart';
 import 'package:http/src/client.dart';
 import 'package:web3dart/web3dart.dart';
@@ -37,14 +35,14 @@ class Web3Connection {
 
 
   Future<ContractAbi> getABI(String _contractName) async {
-    String abiFile = await rootBundle.loadString('../build/contracts/'+_contractName+'.json');
+    String abiFile = await rootBundle.loadString('build/contracts/'+_contractName+'.json');
     var jsonABI = jsonDecode(abiFile);
     ContractAbi _abiCode = ContractAbi.fromJson(jsonEncode(jsonABI['abi']), _contractName);
     return _abiCode;
 
   }
   Future<EthereumAddress> getContractAddress(String _contractName) async {
-    String abiFile = await rootBundle.loadString('../build/contracts/'+_contractName+'.json');
+    String abiFile = await rootBundle.loadString('build/contracts/'+_contractName+'.json');
     var jsonABI = jsonDecode(abiFile);
     EthereumAddress ContractAddress = EthereumAddress.fromHex(jsonABI["networks"]["5777"]["address"]);
     return ContractAddress;

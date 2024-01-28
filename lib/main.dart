@@ -1,21 +1,36 @@
-import 'package:chatflutter/screens/blockchain_screen.dart';
-import 'package:chatflutter/screens/create_screen.dart';
-import 'package:chatflutter/screens/home_screen.dart';
-import 'package:chatflutter/screens/profile_screen.dart';
-import 'package:chatflutter/screens/search_screen.dart';
+import 'package:chatflutter/screens/common/blockchain_screen.dart';
+import 'package:chatflutter/screens/organisation/create_screen.dart';
+import 'package:chatflutter/screens/particular/home_screen.dart';
+import 'package:chatflutter/screens/main_organisations.dart';
+import 'package:chatflutter/screens/main_particulars.dart';
+import 'package:chatflutter/screens/particular/search_screen.dart';
+import 'package:chatflutter/services/organisations_manager_service.dart';
+import 'package:chatflutter/services/user_session.dart';
 import 'package:chatflutter/services/web3_connection.dart';
-import 'package:chatflutter/services/web3_service.dart';
-import 'package:chatflutter/widgets/custom_searchbar.dart';
+import 'package:chatflutter/widgets/particular/custom_searchbar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:web3dart/credentials.dart';
+
+import 'models/AuthenticatedUser.dart';
+import 'models/Organisation.dart';
 
 Future<void> main() async {
   await dotenv.load(fileName: ".env");
-  runApp(const MyApp());
+  // when implement authentication replace this line with async function that fetch private and publickey
+
+  // This is a particular auth
+  UserSession.loginUser(new AuthenticatedUser(publicKey: '0x0df08E74FFd70cd5D4C28D5bA6261755040E69d1', privateKey: '0x3537081c99dff4618e1f3de8382912a1d7ccf651ade0e015b45b79cf25808384', type: UserType.Particular));
+
+  // This is an organisation auth
+  //UserSession.loginUser(new AuthenticatedUser(publicKey: '0xA16842b28FF96Ec695008996F0D85BE705A2c4Dd', privateKey: '0xf0906fd865d515fed0f4563175bfc5da0eb44cce630fac63a8ede30816d2e6ed', type: UserType.Organisation));
+
+  runApp(MyApp(currentUser: UserSession.currentUser));
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  final AuthenticatedUser currentUser;
+  const MyApp({super.key, required this.currentUser});
 
   // This widget is the root of your application.
   @override
@@ -23,127 +38,10 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // TRY THIS: Try running your application with "flutter run". You'll see
-        // the application has a purple toolbar. Then, without quitting the app,
-        // try changing the seedColor in the colorScheme below to Colors.green
-        // and then invoke "hot reload" (save your changes or press the "hot
-        // reload" button in a Flutter-supported IDE, or press "r" if you used
-        // the command line to start the app).
-        //
-        // Notice that the counter didn't reset back to zero; the application
-        // state is not lost during the reload. To reset the state, use hot
-        // restart instead.
-        //
-        // This works for code too, not just values: Most code changes can be
-        // tested with just a hot reload.
         colorScheme: ColorScheme.light(),
         useMaterial3: true,
       ),
-      home: const MyHomePage(title: 'Flutter Demo test Home Page'),
-    );
-  }
-}
-
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
-
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
-
-  final String title;
-
-  @override
-  State<MyHomePage> createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
-  int _currentScreenIndex = 0;
-  Widget _buildBody() {
-    switch (_currentScreenIndex) {
-      case 0:
-        return HomeScreen();
-      case 1:
-        return SearchScreen();
-      case 2:
-        return CreateScreen();
-      case 3:
-        return BlockchainScreen();
-      case 4:
-        return ProfileScreen();
-      default:
-        return Container();
-    }
-  }
-  @override
-  void initState() {
-    super.initState();
-    Web3Connection web3Conn = new Web3Connection("HTTP://127.0.0.1:7545", "HTTP://10.0.2.2:7545", "0x85289cd8817f6df013284fb557cfdb5b9feada4f9556be58594c2c9ac2afe970");
-
-    Web3Service web3Service = new Web3Service(web3Conn);
-
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
-    return Scaffold(
-      appBar:  PreferredSize(
-        preferredSize: Size.fromHeight(80.0), // Hauteur personnalisée de la barre de recherche
-        child: Padding(
-            padding: const EdgeInsets.all(16),
-            child:CustomSearchBar()),
-      ),
-      body:Container(padding: EdgeInsets.all(16.0),child:_buildBody()),
-      bottomNavigationBar: BottomNavigationBar(
-        backgroundColor: Colors.blueGrey[50],
-        fixedColor: Colors.black,
-        unselectedItemColor: Colors.black,
-        currentIndex: _currentScreenIndex,
-        onTap: (index) {
-          setState(() {
-            _currentScreenIndex = index;
-          });
-        },
-        items: [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Home',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.search),
-            label: 'Search',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.add),
-            label: 'Create',
-          ),
-          BottomNavigationBarItem(
-            icon: Image.asset(
-              '../assets/blockchain_icon.png',
-              width: 25.0, // Ajustez la largeur selon vos besoins
-              height: 25.0, // Ajustez la hauteur selon vos besoins
-            ),
-            label: 'CertiChain',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            label: 'Profil',
-          ),
-        ],
-      ),
+      home:  currentUser.type == UserType.Particular ? MainParticulars(title: 'Flutter Demo test Home Page') : MainOrganisations(title: 'Flutter Demo test Home Page'),
     );
   }
 }

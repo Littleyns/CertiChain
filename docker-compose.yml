@@ -1,0 +1,14 @@
+version: '3'
+
+services:
+  truffle:
+    build:
+      context: .
+      dockerfile: Dockerfile.truffle
+    networks:
+      - ganache_network
+    volumes:
+      - .:/app
+
+networks:
+  ganache_network:
