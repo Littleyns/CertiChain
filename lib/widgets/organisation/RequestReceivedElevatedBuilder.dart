@@ -36,59 +36,58 @@ class RequestReceivedElevatedBuilder {
         ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              issuerName,
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                color: Colors.white,
+            children: [
+              Text(
+                issuerName,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: Colors.white,
+                ),
               ),
-            ),
-            SizedBox(height: 8.0),
-            Text(
-              templateDocName,
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 15.0,
+              SizedBox(height: 8.0),
+              Text(
+                templateDocName,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 15.0,
+                ),
               ),
-            ),
-            SizedBox(height: 8.0),
-            Text(
-              status,
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 15.0,
+              SizedBox(height: 8.0),
+              Text(
+                status,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 15.0,
+                ),
               ),
-            ),
-            SizedBox(height: 8.0),
-            documentRequests[i].status==DocumentTransactionStatus.Pending?Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                ElevatedButton(onPressed: () => onAccepted(UserSession.currentUser, documentRequests[i],reqService),style:ElevatedButton.styleFrom(
-                  primary: Colors.white,
-                  shape: ContinuousRectangleBorder(
-                    borderRadius: BorderRadius.circular(10.0),
-                  ),
-                ), child: Text("Accepter",style:TextStyle(
-                  color: Colors.green,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 12.0,
-                ))),
-                SizedBox(width: 8.0),
-                ElevatedButton(onPressed: () => onRefused(UserSession.currentUser, documentRequests[i],reqService),style:ElevatedButton.styleFrom(
-                  primary: Colors.white,
-                  shape: ContinuousRectangleBorder(
-                    borderRadius: BorderRadius.circular(10.0),
-                  ),
-                ),child: Text("Refuser",style:TextStyle(
-                  color: Colors.red,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 12.0,
-                ))),
-              ],):SizedBox(height: 8.0)
-          ],
+              SizedBox(height: 8.0),
+              documentRequests[i].status==DocumentTransactionStatus.Pending?Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  ElevatedButton(onPressed: () => onAccepted(UserSession.currentUser, documentRequests[i],reqService),style:ElevatedButton.styleFrom(
+                    primary: Colors.white,
+                    shape: ContinuousRectangleBorder(
+                      borderRadius: BorderRadius.circular(10.0),
+                    ),
+                  ), child: Text("Accepter",style:TextStyle(
+                    color: Colors.green,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 12.0,
+                  ))),
+                  SizedBox(width: 8.0),
+                  ElevatedButton(onPressed: () => onRefused(UserSession.currentUser, documentRequests[i],reqService),style:ElevatedButton.styleFrom(
+                    primary: Colors.white,
+                    shape: ContinuousRectangleBorder(
+                      borderRadius: BorderRadius.circular(10.0),
+                    ),
+                  ),child: Text("Refuser",style:TextStyle(
+                    color: Colors.red,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 12.0,
+                  ))),
+                ],):SizedBox(height: 8.0)],
         ),
       );
 

@@ -6,7 +6,7 @@ import 'package:chatflutter/models/DocumentRequest.dart';
 
 
 
-class ElevatedButtonBuilder3 {
+class DocRequestsSendedElevatedBuilder {
   static List<Widget> buildButtons({
     required List<DocumentRequest> documentRequests,
     required Function(DocumentRequest) onPressed,

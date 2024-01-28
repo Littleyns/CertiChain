@@ -3,7 +3,7 @@ import 'package:chatflutter/widgets/organisation/RequestSendedElevatedBuilder.da
 import 'package:chatflutter/widgets/organisation/RequestReceivedElevatedBuilder.dart';
 import 'package:chatflutter/widgets/organisation/TDocsElevatedBuilder.dart';
 import 'package:flutter/material.dart';
-import 'package:chatflutter/widgets/particular/ElevatedButtonBuilder.dart';
+import 'package:chatflutter/widgets/particular/DocumentsElevatedBuilder.dart';
 import 'package:chatflutter/services/web3_connection.dart';
 import 'package:flutter/widgets.dart' show WidgetsFlutterBinding;
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -11,7 +11,7 @@ import 'package:web3dart/credentials.dart';
 
 import '../../models/AuthenticatedUser.dart';
 import '../../models/DocumentRequest.dart';
-import '../../widgets/particular/ElevatedButtonBuilder2.dart';
+import '../../widgets/particular/FavOrgsElevatedBuilder.dart';
 import '../../models/GrantRequest.dart';
 import '../../models/Organisation.dart';
 import '../../models/TemplateDocument.dart';
@@ -19,8 +19,8 @@ import '../../models/Document.dart';
 import '../../services/organisations_manager_service.dart';
 import '../../services/particulars_manager_service.dart';
 import '../../services/user_session.dart';
-import '../../widgets/particular/ElevatedButtonBuilder3.dart';
-import '../../widgets/particular/ElevatedButtonBuilder4.dart';
+import '../../widgets/particular/DocRequestsSendedElevatedBuilder.dart';
+import '../../widgets/particular/GrantRequestsReceivedElevatedBuilder.dart';
 import '../../widgets/particular/form_organisation.dart';
 import '../organisation/create_screen.dart';
 
@@ -196,37 +196,28 @@ class _HomeScreenState extends State<HomeScreen> {
 
                 },
 
-              ),
-            ),
-          const SizedBox(height: 20),
-            GridView.count(
-              crossAxisCount: 2,
-              crossAxisSpacing: 16.0,
-              mainAxisSpacing: 16.0,
-              shrinkWrap: true,
+              )+RequestReceivedElevatedBuilder.buildButtons(
+                  documentRequests: requestReceived,
+                  reqService : requestsService,
+                  onPressed: (DocumentRequest requestReceived) {
 
-              children:
-              RequestReceivedElevatedBuilder.buildButtons(
-                documentRequests: requestReceived,
-                reqService : requestsService,
-                onPressed: (DocumentRequest requestReceived) {
-
-                },
-                onAccepted: (AuthenticatedUser user, DocumentRequest requestReceived, RequestsManagerService reqService) async {
+                  },
+                  onAccepted: (AuthenticatedUser user, DocumentRequest requestReceived, RequestsManagerService reqService) async {
                     await reqService.acceptGrantedDocument(EthPrivateKey.fromHex(user.privateKey), requestReceived.docRequestId);
                     print("Document accepté");
                     await context.state.refreshGrantedDocs();
 
-                },
+                  },
 
-                onRefused: (AuthenticatedUser user, DocumentRequest requestReceived, RequestsManagerService reqService) async {
-                  await reqService.rejectDocumentGrant(EthPrivateKey.fromHex(user.privateKey), requestReceived.docRequestId);
-                  print("Document accepté");
-                  await context.state.refreshGrantedDocs();
-                  print("doc refused");
-                }
+                  onRefused: (AuthenticatedUser user, DocumentRequest requestReceived, RequestsManagerService reqService) async {
+                    await reqService.rejectDocumentGrant(EthPrivateKey.fromHex(user.privateKey), requestReceived.docRequestId);
+                    print("Document accepté");
+                    await context.state.refreshGrantedDocs();
+                    print("doc refused");
+                  }
               ),
             )
+
 
           ],
         ),

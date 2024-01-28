@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:chatflutter/models/Document.dart';
-class ElevatedButtonBuilder {
+class DocumentsElevatedBuilder {
   static List<Widget> buildButtons({
     required List<Document> documents,
     required Function(Document) onPressed,

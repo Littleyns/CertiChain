@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:chatflutter/models/Organisation.dart';
 
 
-class ElevatedButtonBuilder2 {
+class FavOrgsElevatedBuilder {
   static List<Widget> buildButtons({
     required List<Organisation> organizations,
     required Function onPressed,
