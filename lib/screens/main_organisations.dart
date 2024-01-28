@@ -73,7 +73,7 @@ class _MainOrganisationsState extends State<MainOrganisations> {
         preferredSize: Size.fromHeight(80.0), // Hauteur personnalisée de la barre de recherche
         child: Image.asset(
           'assets/images/logo.png',
-          width: 150, // Largeur personnalisée
+          width: 100, // Largeur personnalisée
           height: 100, // Hauteur personnalisée
           fit: BoxFit.contain, // Ajuster l'image dans les limites définies
         )
