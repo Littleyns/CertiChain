@@ -3,10 +3,14 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:web3dart/web3dart.dart';
 
 import '../../models/Document.dart';
+import '../../models/Organisation.dart';
+import '../../models/Particular.dart';
 import '../../services/documents_manager_service.dart';
 import '../../services/organisations_manager_service.dart';
 import '../../services/particulars_manager_service.dart';
 import '../../services/web3_connection.dart';
+import '../../widgets/common/OrganisationAutoComplete.dart';
+import '../../widgets/common/ParticularsAutoComplete.dart';
 
 class BlockchainScreen extends StatefulWidget {
   @override
@@ -23,6 +27,9 @@ class _BlockchainScreenState extends State<BlockchainScreen> {
   TextEditingController searchController = TextEditingController();
   late List<Document> displayedDocuments = [];
   late List<Document> baseDocs;
+
+  late Particular selectedParticular;
+  late Organisation selectedOrganisation;
   @override
   void initState() {
     super.initState();
@@ -35,7 +42,6 @@ class _BlockchainScreenState extends State<BlockchainScreen> {
     particularsService = new ParticularsManagerService(web3Conn);
     organisationsService = new OrganisationsManagerService(web3Conn);
     documentsService = new DocumentsManagerService(web3Conn);
-    EthereumAddress contractAddr = await web3Conn.getContractAddress("DocumentsManager");
     await particularsService.initializeContract(); // Maybe show requests also
     await documentsService.initializeContract();
     await organisationsService.initializeContract();
@@ -48,20 +54,24 @@ class _BlockchainScreenState extends State<BlockchainScreen> {
   Future<void> exploreData() async {
     final searchValue = searchController.text.trim();
 
-    if (searchValue.isEmpty) {
-      setState(() {
-        displayedDocuments = baseDocs;
-      });
-      return;
-    }
-
     if (selectedFilter == SearchFilter.OwnerAddress) {
       // Recherche par adresse
-      await exploreDataByOwnerAddress(searchValue);
+      if(selectedParticular == null){
+        setState(() {
+          displayedDocuments = baseDocs;
+        });
+      }
+      await exploreDataByOwnerAddress(selectedParticular.particularAddress);
     } else if(selectedFilter == SearchFilter.OrgAddress){
       // Recherche par nom
-      await exploreDataByOrgAddress(searchValue);
+      await exploreDataByOrgAddress(selectedOrganisation.orgAddress);
     }else if(selectedFilter == SearchFilter.TemplateDocName){
+      if (searchValue.isEmpty) {
+        setState(() {
+          displayedDocuments = baseDocs;
+        });
+        return;
+      }
       await exploreDataByTemplateDocName(searchValue);
     }
 
@@ -91,6 +101,33 @@ class _BlockchainScreenState extends State<BlockchainScreen> {
     });
   }
 
+  Widget searchInputBuilder(SearchFilter filter){
+    if(filter == SearchFilter.OwnerAddress){
+      return Expanded(child: ParticularAutocomplete(particularsService: particularsService,onSelected:onSelectedParticular ,inputDecoration: InputDecoration(labelText:"Owner Address")));
+    }else if(filter == SearchFilter.OrgAddress){
+      return Expanded(child: OrganisationAutocomplete(organisationsService: organisationsService,onSelected:onSelectedOrganisation ,inputDecoration: InputDecoration(labelText:"Org Address")));;
+      } else if(filter == SearchFilter.TemplateDocName){
+      return Expanded(
+          child: TextField(
+            controller: searchController,
+            decoration: InputDecoration(labelText: selectedFilter == SearchFilter.OwnerAddress ? 'Owner address' : (selectedFilter == SearchFilter.OrgAddress ? 'Org Address': 'Template doc Name')),
+            onSubmitted: (value) => exploreData(),
+          ));
+    }
+    return Text("no searchbar");
+  }
+
+  void onSelectedParticular(Particular p){
+    setState((){
+      selectedParticular = p;
+    });
+  }
+  void onSelectedOrganisation(Organisation org){
+    setState((){
+      selectedOrganisation = org;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -114,13 +151,8 @@ class _BlockchainScreenState extends State<BlockchainScreen> {
                   .toList(),
             ),
             SizedBox(width: 16),
-            Expanded(
-              child: TextField(
-                controller: searchController,
-                decoration: InputDecoration(labelText: selectedFilter == SearchFilter.OwnerAddress ? 'Owner address' : (selectedFilter == SearchFilter.OrgAddress ? 'Org Address': 'Template doc Name')),
-                onSubmitted: (value) => exploreData(),
-              ),
-            ),
+            searchInputBuilder(selectedFilter),
+
 
 
           ],

@@ -54,7 +54,13 @@ module.exports = async function (deployer, network, accounts) {
   var adressePubliqueParticulier = "0x0df08E74FFd70cd5D4C28D5bA6261755040E69d1";
   var adressePriveeParticulier = "0x3537081c99dff4618e1f3de8382912a1d7ccf651ade0e015b45b79cf25808384";
   var particulierAccount = web3.eth.accounts.privateKeyToAccount(adressePriveeParticulier).address;
+
+    var adressePubliqueParticulier2 = "0x7e2d0b3fCdFEbd1469A779aaebb62D87d9f10fF3";
+    var adressePriveeParticulier2 = "0x9d39fd4825cd5782ad312221d7fbba40588e6f595c1f92e4f70c4e9a8ab44015";
+    var particulier2Account = web3.eth.accounts.privateKeyToAccount(adressePriveeParticulier2).address;
+
   await particularManager.addParticular(adressePubliqueParticulier, "toto",{ from: serverAccount });
+  await particularManager.addParticular(adressePubliqueParticulier2, "tata",{ from: serverAccount });
 
   await docManager.createTemplateDocument(adressePubliqueOrganisation,"Diplome d'ingénieur",{ from: organisationAccount });
   await docManager.createTemplateDocument(adressePubliqueOrganisation,"Master spécialisé en big data",{ from: organisationAccount });
@@ -77,7 +83,9 @@ module.exports = async function (deployer, network, accounts) {
   var diplomeInge = templateDocuments[0];
   var masterSpecialise= templateDocuments[1];
   var masterCyber= templateDocuments[2];
-  var masterReseau = templateDocuments[5]
+  var masterReseau = templateDocuments[5];
+  var masterWeb = templateDocuments[4];
+  var masterIOT = templateDocuments[3];
 
   // Récupération des documents de l'organisme 2
   var templateDocuments2 = await orgManager.getOrgTemplateDocuments(adressePubliqueOrganisation2);
@@ -88,16 +96,24 @@ module.exports = async function (deployer, network, accounts) {
     console.log("visaLongId"+visaLong[0]);
 
 
-  //Demande d'un document par toto à un organisme
+  //Demande d'un document par toto à un 3iL
   await requestsManager.requestDocument(adressePubliqueOrganisation,diplomeInge.id,{ from: particulierAccount });
   console.log("Document requested from toto to 3iL");
 
-  //Demande d'un document par toto à un organisme
+  //Demande d'un document par toto à un 3iL
   await requestsManager.requestDocument(adressePubliqueOrganisation,masterSpecialise.id,{ from: particulierAccount });
   console.log("Document requested from toto to 3iL");
 
+    //Demande d'un document par tata à un 3iL
+    await requestsManager.requestDocument(adressePubliqueOrganisation,diplomeInge.id,{ from: particulier2Account });
+    console.log("Document requested from tata to 3iL");
+    //Demande d'un document par tata à un 3iL
+    await requestsManager.requestDocument(adressePubliqueOrganisation,diplomeInge.id,{ from: particulier2Account });
+    console.log("Document requested from tata to 3iL");
+
 // Récuperer les requetes d'un organisme
 var docRequests = await orgManager.getOrgRequestsReceived(adressePubliqueOrganisation,{ from: organisationAccount });
+console.log(docRequests);
   for(docRequest of docRequests){
     await requestsManager.acceptDocumentRequest(docRequest.docRequestId, "well deserved doc", -1,{ from: organisationAccount }); // changer l'id, récuperer toutes les requetes d'un utilisateur
     console.log("Document accepted from organisation");
@@ -119,7 +135,6 @@ var docRequests = await orgManager.getOrgRequestsReceived(adressePubliqueOrganis
 
     // Récuperer les requetes grant émises par les organisme pour toto
     var grantRequests = await particularManager.getParticularDocGrantRequests({ from: particulierAccount });
-    console.log(grantRequests);
     // Acceptation du visa court séjour et du master par toto
     await requestsManager.acceptGrantedDocument(grantRequests[0].grantRequestId,{ from: particulierAccount });
     await requestsManager.acceptGrantedDocument(grantRequests[1].grantRequestId,{ from: particulierAccount });

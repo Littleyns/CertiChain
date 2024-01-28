@@ -86,7 +86,7 @@ contract DocumentsManager {
         });
 
         //  persistence
-        orgContract.addDocumentToOrg(nextDocumentId, msg.sender);
+        orgContract.addDocumentToOrg(nextDocumentId, _orgAddress);
         documents[nextDocumentId] = newDocument;
 
         nextDocumentId++;

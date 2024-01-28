@@ -11,6 +11,7 @@ import '../../services/particulars_manager_service.dart';
 import '../../services/requests_manager_service.dart';
 import '../../services/user_session.dart';
 import '../../services/web3_connection.dart';
+import '../common/ParticularsAutoComplete.dart';
 
 
 void _showPopupDocGranted(BuildContext context, String templateDocName, String recipientName) {
@@ -97,6 +98,11 @@ class _MyDocumentGrantFormState extends State<DocumentGrantForm> {
     });
   }
 
+  void selectParticular(Particular sp){
+    setState(() {
+      selectedParticular = sp;
+    });
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -108,53 +114,8 @@ class _MyDocumentGrantFormState extends State<DocumentGrantForm> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
+            ParticularAutocomplete(particularsService: particularsService,inputDecoration: inputDecoration("User public key"),onSelected: selectParticular),
 
-            Autocomplete<Particular>(
-              fieldViewBuilder: (BuildContext context,
-                  TextEditingController textEditingController,
-                  FocusNode focusNode,
-                  VoidCallback onFieldSubmitted) {
-                return TextFormField(
-                  textInputAction: TextInputAction.next,
-                  style: const TextStyle(color: Colors.black),
-                  controller: textEditingController,
-                  focusNode: focusNode,
-                  onFieldSubmitted: (String value) {
-                    onFieldSubmitted();
-                  },
-                  decoration: inputDecoration("User Public Key"),
-                );
-              },
-              optionsBuilder: (TextEditingValue textEditingValue) async {
-                // Filtrer les documents en fonction de ce que l'utilisateur a tapé.
-                //Iterable<Particular> filtered = await particularsService.getParticularName(textEditingValue.text.toLowerCase()) as Iterable<Particular>;
-                String address = textEditingValue.text;//"0x0df08E74FFd70cd5D4C28D5bA6261755040E69d1";
-                if(textEditingValue.text.split(" ").length==2){
-                  address= textEditingValue.text.split(" ")[0];
-                }
-                List<Particular> filtered = [];
-
-                if(address.length>40 ) {
-                  var name = await particularsService.getParticularName(
-                      address);
-                  filtered = [
-                    new Particular(particularAddress: address,
-                        username: name,
-                        favouriteOrgs: [])
-                  ];
-                }
-                return filtered;
-              },
-
-              onSelected: (Particular sp) {
-                print("assigning sp ${sp.username} ${sp.particularAddress}");
-                setState(() {
-                  selectedParticular = sp;
-                });
-              },
-              displayStringForOption: (Particular option) => "${option.particularAddress} (${option.username})",
-
-            ),
             SizedBox(height: 16.0),
             Autocomplete<TemplateDocument>(
               fieldViewBuilder: (BuildContext context,
